@@ -346,6 +346,30 @@
     }
     .btn-cal:active { transform: scale(0.97); }
 
+    /* ── Botón de música flotante ── */
+    .music-btn {
+      position: fixed;
+      right: 16px;
+      bottom: 16px;
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: var(--cafe);
+      color: #fff;
+      border: 2px solid var(--cafe-cl);
+      font-size: 22px;
+      cursor: pointer;
+      z-index: 180;
+      box-shadow: 0 6px 18px rgba(92,51,24,0.35);
+      transition: transform .12s;
+    }
+    .music-btn:active { transform: scale(0.92); }
+    .music-btn.playing { animation: pulso 2.4s ease-in-out infinite; }
+    @keyframes pulso {
+      0%, 100% { box-shadow: 0 6px 18px rgba(92,51,24,0.35); }
+      50%      { box-shadow: 0 6px 26px rgba(139,94,60,0.65); }
+    }
+
     .hidden { display: none !important; }
     .error-card { text-align: center; }
     .error-title { font-family: 'Dancing Script', cursive; color: var(--cafe); font-size: 32px; }
@@ -448,6 +472,9 @@
 
 </div>
 
+<audio id="bg-music" src="lullaby.mp3" loop preload="auto"></audio>
+<button class="music-btn" id="music-btn" aria-label="Música">🔇</button>
+
 <div class="toast hidden" id="toast" role="status" aria-live="polite"></div>
 <div class="confetti" id="confetti" aria-hidden="true"></div>
 
@@ -535,6 +562,37 @@
     });
   }, { threshold: 0.15 });
   document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // ── Música de fondo ──
+  (function() {
+    const audio = $('#bg-music');
+    const btn   = $('#music-btn');
+    audio.volume = 0.35;
+
+    function setUI(playing) {
+      btn.textContent = playing ? '🎵' : '🔇';
+      btn.classList.toggle('playing', playing);
+    }
+
+    btn.addEventListener('click', () => {
+      if (audio.paused) audio.play().then(() => setUI(true)).catch(() => {});
+      else { audio.pause(); setUI(false); audio._userPaused = true; }
+    });
+
+    // arrancar en la primera interacción (los navegadores bloquean autoplay)
+    function tryStart() {
+      if (!audio.paused || audio._userPaused) return cleanup();
+      audio.play().then(() => { setUI(true); cleanup(); }).catch(() => {});
+    }
+    function cleanup() {
+      ['pointerdown','touchstart','keydown','scroll'].forEach(ev =>
+        document.removeEventListener(ev, tryStart));
+    }
+    ['pointerdown','touchstart','keydown','scroll'].forEach(ev =>
+      document.addEventListener(ev, tryStart, { passive: true }));
+    // intento directo por si el navegador lo permite
+    audio.play().then(() => { setUI(true); cleanup(); }).catch(() => {});
+  })();
 
   // ── Agregar al calendario ──
   $('#btn-cal').addEventListener('click', () => {
