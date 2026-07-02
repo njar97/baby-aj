@@ -32,7 +32,13 @@
     }
 
     html, body {
-      background: var(--crema);
+      /* fondo acuarela suave con manchas crema/beige como el Canva */
+      background:
+        radial-gradient(ellipse 600px 400px at 85% 8%,  rgba(232,216,196,0.55), transparent 65%),
+        radial-gradient(ellipse 500px 380px at 10% 30%, rgba(245,235,217,0.8),  transparent 60%),
+        radial-gradient(ellipse 550px 420px at 90% 75%, rgba(226,206,184,0.45), transparent 65%),
+        radial-gradient(ellipse 480px 360px at 15% 95%, rgba(240,228,210,0.6),  transparent 60%),
+        var(--crema);
       font-family: 'Nunito', sans-serif;
       color: var(--cafe-d);
       min-height: 100vh;
@@ -58,7 +64,8 @@
       margin: 20px 0 0;
       border-radius: 24px;
       overflow: hidden;
-      box-shadow: 0 8px 28px rgba(139,94,60,0.18);
+      border: 3px solid rgba(255,255,255,0.9);
+      box-shadow: 0 10px 32px rgba(139,94,60,0.22);
     }
     .hero-img-wrap img { width: 100%; display: block; }
 
@@ -78,10 +85,46 @@
 
     .titulo-evento {
       font-family: 'Dancing Script', cursive;
-      font-size: 72px;
-      color: var(--cafe);
+      font-size: 74px;
       line-height: 1;
-      text-shadow: 2px 2px 0 rgba(92,51,24,0.10);
+      background: linear-gradient(135deg, var(--cafe) 20%, #A9764E 50%, var(--cafe-d) 85%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      filter: drop-shadow(2px 3px 2px rgba(92,51,24,0.14));
+      padding-bottom: 6px;
+    }
+
+    /* FECHA en badge de 3 partes estilo save-the-date */
+    .fecha-badge {
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+      gap: 0;
+      margin: 4px auto 14px;
+      max-width: 320px;
+    }
+    .fecha-badge > div {
+      padding: 8px 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .fb-lado {
+      font-size: 13px;
+      letter-spacing: 3px;
+      font-weight: 700;
+      color: var(--cafe);
+      text-transform: uppercase;
+    }
+    .fb-lado.izq { border-top: 1.5px solid var(--banda); border-bottom: 1.5px solid var(--banda); text-align: right; }
+    .fb-lado.der { border-top: 1.5px solid var(--banda); border-bottom: 1.5px solid var(--banda); text-align: left; }
+    .fb-centro {
+      font-family: 'Dancing Script', cursive;
+      font-size: 54px;
+      color: var(--cafe-d);
+      line-height: 1;
+      padding: 2px 20px !important;
     }
 
     /* BANDA café con el nombre — igual que en el Canva */
@@ -152,11 +195,13 @@
 
     /* ── CARDS ── */
     .card {
-      background: #fff;
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(4px);
+      border: 1.5px solid rgba(184,146,106,0.35);
       border-radius: 24px;
       padding: 24px 22px;
       margin-top: 16px;
-      box-shadow: 0 6px 24px rgba(139,94,60,0.10);
+      box-shadow: 0 10px 30px rgba(139,94,60,0.12);
     }
     .card-label {
       font-size: 10px;
@@ -331,7 +376,6 @@
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      margin-top: 14px;
       padding: 12px 22px;
       border-radius: 999px;
       background: var(--cafe-cl);
@@ -399,16 +443,20 @@
 
   <!-- FECHA, HORA, LUGAR -->
   <div class="info-bloque reveal">
-    <p class="info-fecha">Julio 26 / 2:00 pm</p>
+    <div class="fecha-badge">
+      <div class="fb-lado izq">Julio<br/>2026</div>
+      <div class="fb-centro">26</div>
+      <div class="fb-lado der">Domingo<br/>2:00 pm</div>
+    </div>
     <div class="divisor"><span style="font-size:16px;">⭐</span></div>
     <p class="info-lugar">
       Col. Montevideo, Av. Salarrué<br/>
-      Block C, casa #7 · Frente a taller corea
+      Block C, casa #7 · Frente a Taller Corea
     </p>
-    <br/>
-    <a class="maps-link" href="https://maps.google.com/?q=Colonia+Montevideo+Avenida+Salarrue+El+Salvador" target="_blank" rel="noopener">📍 Ver en Maps →</a>
-    <br/>
-    <button class="btn-cal" id="btn-cal">📅 Agregar al calendario</button>
+    <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:14px;">
+      <a class="btn-cal" href="https://maps.google.com/?q=Colonia+Montevideo+Avenida+Salarrue+El+Salvador" target="_blank" rel="noopener" style="text-decoration:none;">📍 Cómo llegar</a>
+      <button class="btn-cal" id="btn-cal">📅 Agendar</button>
+    </div>
   </div>
 
   <!-- PARA (nombre del invitado, solo con ?id=) -->
