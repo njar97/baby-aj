@@ -1,0 +1,1551 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#8B5E3C" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Admin · Baby Shower AJ</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --rojo: #8B5E3C;
+      --rojo-osc: #5C3318;
+      --negro: #3A2A1E;
+      --crema: #FBF5EE;
+      --crema-suave: #FDF9F3;
+      --amarillo: #C9A84C;
+      --blanco: #FFFFFF;
+      --verde: #2A9D8F;
+      --gris: #8A7060;
+      --gris-claro: #E8DFD3;
+    }
+
+    html, body {
+      background: var(--crema);
+      font-family: 'Nunito', system-ui, -apple-system, sans-serif;
+      color: var(--negro);
+      min-height: 100vh;
+    }
+
+    .wrap {
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 20px 16px 64px;
+    }
+
+    /* ---- Login ---- */
+    .login-wrap {
+      max-width: 380px;
+      margin: 80px auto 0;
+      padding: 0 16px;
+    }
+    .login-card {
+      background: var(--blanco);
+      border-radius: 24px;
+      padding: 32px 24px;
+      box-shadow: 0 14px 36px rgba(26,26,26,0.10);
+      text-align: center;
+    }
+    .login-title {
+      font-family: 'Dancing Script', cursive;
+      font-size: 28px;
+      color: var(--rojo);
+      letter-spacing: 0.5px;
+      font-weight: normal;
+    }
+    .login-sub {
+      font-size: 13px;
+      color: var(--gris);
+      margin-top: 4px;
+    }
+    .login-form {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    /* ---- Header ---- */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .header h1 {
+      font-family: 'Dancing Script', cursive;
+      font-size: 24px;
+      color: var(--rojo);
+      font-weight: normal;
+      letter-spacing: 0.5px;
+    }
+    .header-actions { display: flex; gap: 8px; align-items: center; }
+    .user-email { font-size: 12px; color: var(--gris); }
+
+    /* ---- Stats ---- */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    @media (min-width: 640px) {
+      .stats { grid-template-columns: repeat(4, 1fr); }
+    }
+    .stat-card {
+      background: var(--blanco);
+      border-radius: 16px;
+      padding: 14px 14px;
+      box-shadow: 0 6px 16px rgba(26,26,26,0.06);
+      border-top: 4px solid var(--gris-claro);
+    }
+    .stat-card.confirmed { border-top-color: var(--verde); }
+    .stat-card.declined  { border-top-color: var(--gris); }
+    .stat-card.pending   { border-top-color: var(--amarillo); }
+    .stat-card.sent      { border-top-color: var(--rojo); }
+    .stat-label {
+      font-size: 11px;
+      letter-spacing: 1px;
+      color: var(--gris);
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    .stat-value {
+      font-family: 'Dancing Script', cursive;
+      font-size: 26px;
+      color: var(--negro);
+      margin-top: 4px;
+      line-height: 1;
+    }
+    .stat-extra {
+      font-size: 11px;
+      color: var(--gris);
+      margin-top: 4px;
+    }
+
+    /* ---- Progress ---- */
+    .progress-card {
+      background: var(--blanco);
+      border-radius: 16px;
+      padding: 14px 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 6px 16px rgba(26,26,26,0.06);
+    }
+    .progress-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--gris);
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+    .progress-bar {
+      height: 10px;
+      background: var(--gris-claro);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--rojo), var(--amarillo));
+      transition: width .4s ease;
+    }
+
+    /* ---- Toolbar ---- */
+    .toolbar {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+    .toolbar input,
+    .toolbar select {
+      flex: 1;
+      min-width: 0;
+      font-family: 'Nunito', sans-serif;
+      font-size: 14px;
+      padding: 10px 12px;
+      border: 2px solid var(--negro);
+      border-radius: 12px;
+      background: var(--blanco);
+      color: var(--negro);
+    }
+    .toolbar select { flex: 0 1 auto; }
+    .toolbar input:focus,
+    .toolbar select:focus { outline: none; border-color: var(--rojo); }
+
+    /* ---- Card de invitado ---- */
+    .invitado-card {
+      background: var(--blanco);
+      border-radius: 18px;
+      padding: 14px 16px;
+      margin-bottom: 10px;
+      box-shadow: 0 4px 12px rgba(26,26,26,0.05);
+      border-left: 6px solid var(--gris-claro);
+    }
+    .invitado-card.estado-confirmado { border-left-color: var(--verde); background: #F0FAF8; }
+    .invitado-card.estado-declinado  { border-left-color: var(--gris);  background: #F5F5F5; }
+    .invitado-card.estado-pendiente  { border-left-color: var(--amarillo); background: #FFFBEC; }
+
+    .inv-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .inv-info h3 {
+      font-family: 'Nunito', sans-serif;
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--negro);
+      line-height: 1.2;
+    }
+    .inv-meta {
+      font-size: 12px;
+      color: var(--gris);
+      margin-top: 3px;
+    }
+    .inv-meta span { margin-right: 6px; }
+
+    .badges { display: flex; gap: 6px; flex-wrap: wrap; }
+    .badge {
+      font-size: 12px;
+      font-weight: 700;
+      padding: 5px 12px;
+      border-radius: 999px;
+      letter-spacing: 0.3px;
+      white-space: nowrap;
+    }
+    .badge-confirmado { background: #C6EDE8; color: #1A7A6E; border: 1.5px solid #2A9D8F; }
+    .badge-declinado  { background: #E5E5E5; color: #555; border: 1.5px solid #aaa; }
+    .badge-pendiente  { background: #FFE99A; color: #7A5500; border: 1.5px solid var(--amarillo); }
+    .badge-enviado    { background: #FCE2E5; color: var(--rojo-osc); }
+    .badge-no-enviado { background: #F4F4F4; color: var(--gris); border: 1px dashed var(--gris); }
+
+    .inv-actions {
+      display: flex;
+      gap: 6px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+    .inv-actions button {
+      font-family: 'Nunito', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 8px 12px;
+      border: 2px solid var(--negro);
+      border-radius: 10px;
+      cursor: pointer;
+      background: var(--blanco);
+      color: var(--negro);
+      transition: transform .06s, box-shadow .06s;
+    }
+    .inv-actions button:hover { background: var(--crema-suave); }
+    .inv-actions button:active { transform: translateY(1px); }
+    .inv-actions .btn-wa {
+      background: #25D366;
+      color: var(--blanco);
+      border-color: var(--negro);
+    }
+    .inv-actions .btn-wa:hover { background: #1FAE54; }
+    .inv-actions .btn-wa.sent {
+      background: var(--gris-claro);
+      color: var(--gris);
+    }
+    .inv-actions .btn-del { color: var(--rojo); }
+    .inv-actions .btn-del:hover { background: #FCE2E5; }
+
+    /* ---- Botones rápidos de estado ---- */
+    .quick-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .btn-q-yes, .btn-q-no {
+      font-family: 'Nunito', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      padding: 10px 14px;
+      border-radius: 12px;
+      cursor: pointer;
+      flex: 1;
+      border: 2px solid;
+      transition: transform .06s;
+    }
+    .btn-q-yes:active, .btn-q-no:active { transform: translateY(1px); }
+    .btn-q-yes { background: #DDF4F0; color: #1A7A6E; border-color: var(--verde); }
+    .btn-q-yes:hover { background: #C6EDE8; }
+    .btn-q-no  { background: #FCE2E5; color: var(--rojo-osc); border-color: var(--rojo); }
+    .btn-q-no:hover  { background: #F7C5CA; }
+
+    /* ---- Botones generales ---- */
+    .btn {
+      font-family: 'Nunito', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 10px 16px;
+      border: 2.5px solid var(--negro);
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 3px 0 var(--negro);
+      transition: transform .06s, box-shadow .06s;
+      background: var(--blanco);
+      color: var(--negro);
+    }
+    .btn:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--negro); }
+    .btn:disabled { opacity: 0.55; cursor: wait; }
+    .btn-primary { background: var(--rojo); color: var(--blanco); }
+    .btn-yellow  { background: var(--amarillo); color: var(--negro); }
+    .btn-danger  { background: var(--rojo); color: var(--blanco); }
+    .btn-ghost   { background: transparent; box-shadow: none; }
+
+    .empty {
+      text-align: center;
+      padding: 40px 16px;
+      color: var(--gris);
+      background: var(--blanco);
+      border-radius: 16px;
+      border: 2px dashed var(--gris-claro);
+    }
+
+    /* ---- Modal ---- */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(26,26,26,0.55);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 16px;
+    }
+    .modal {
+      background: var(--blanco);
+      border-radius: 20px;
+      padding: 24px 22px;
+      max-width: 420px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.30);
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .modal-title {
+      font-family: 'Dancing Script', cursive;
+      font-size: 22px;
+      color: var(--rojo);
+      letter-spacing: 0.5px;
+      margin-bottom: 16px;
+      font-weight: normal;
+    }
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+    .field label {
+      font-size: 12px;
+      letter-spacing: 0.5px;
+      color: var(--rojo-osc);
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    .field input,
+    .field select {
+      font-family: 'Nunito', sans-serif;
+      font-size: 15px;
+      padding: 10px 12px;
+      border: 2px solid var(--negro);
+      border-radius: 10px;
+      background: var(--blanco);
+      color: var(--negro);
+    }
+    .field input:focus,
+    .field select:focus { outline: none; border-color: var(--rojo); }
+    .field-hint { font-size: 11px; color: var(--gris); }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .modal-actions .btn { flex: 1; }
+
+    .form-error {
+      color: var(--rojo);
+      font-size: 13px;
+      margin-top: 8px;
+      min-height: 18px;
+      font-weight: 600;
+    }
+    .form-success {
+      color: var(--verde);
+      font-size: 13px;
+      margin-top: 8px;
+      font-weight: 600;
+    }
+
+    /* ---- Password toggle ---- */
+    .pwd-wrap { position: relative; }
+    .pwd-wrap input { padding-right: 46px !important; }
+    .pwd-toggle {
+      position: absolute;
+      right: 6px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: transparent;
+      border: none;
+      font-size: 18px;
+      cursor: pointer;
+      padding: 6px 8px;
+      border-radius: 8px;
+      line-height: 1;
+      user-select: none;
+    }
+    .pwd-toggle:hover { background: var(--gris-claro); }
+    .pwd-toggle:focus { outline: 2px solid var(--rojo); outline-offset: 2px; }
+
+    /* ---- Settings sections ---- */
+    .settings-section {
+      border: 2px solid var(--gris-claro);
+      border-radius: 12px;
+      margin-bottom: 12px;
+      background: var(--crema-suave);
+    }
+    .settings-section summary {
+      cursor: pointer;
+      padding: 12px 14px;
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--rojo-osc);
+      list-style: none;
+      user-select: none;
+    }
+    .settings-section summary::-webkit-details-marker { display: none; }
+    .settings-section summary::after {
+      content: '▾';
+      float: right;
+      transition: transform .2s;
+    }
+    .settings-section[open] summary::after { transform: rotate(180deg); }
+    .settings-section .settings-body {
+      padding: 4px 14px 14px;
+      background: var(--blanco);
+      border-bottom-left-radius: 10px;
+      border-bottom-right-radius: 10px;
+    }
+
+    /* ---- Admin list ---- */
+    .admin-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--gris-claro);
+      gap: 10px;
+    }
+    .admin-row:last-child { border-bottom: none; }
+    .admin-info { flex: 1; min-width: 0; }
+    .admin-info .name {
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--negro);
+    }
+    .admin-info .email {
+      font-size: 12px;
+      color: var(--gris);
+      word-break: break-all;
+    }
+    .admin-info .uid {
+      font-size: 10px;
+      color: var(--gris);
+      font-family: monospace;
+      word-break: break-all;
+    }
+    .admin-row .you-pill {
+      font-size: 10px;
+      background: var(--verde);
+      color: var(--blanco);
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .admin-row button {
+      font-family: 'Nunito', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 10px;
+      border: 2px solid var(--rojo);
+      border-radius: 8px;
+      cursor: pointer;
+      background: var(--blanco);
+      color: var(--rojo);
+    }
+    .admin-row button:hover { background: #FCE2E5; }
+
+    /* ---- Toast ---- */
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 28px;
+      transform: translateX(-50%);
+      background: var(--negro);
+      color: var(--blanco);
+      padding: 12px 20px;
+      border-radius: 14px;
+      font-size: 14px;
+      font-weight: 600;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+      z-index: 200;
+      max-width: 90vw;
+      text-align: center;
+    }
+    .toast.success { background: var(--verde); }
+    .toast.error   { background: var(--rojo); }
+
+    .hidden { display: none !important; }
+
+    .loader {
+      text-align: center;
+      padding: 40px;
+      color: var(--gris);
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ====== LOGIN ====== -->
+  <div class="login-wrap" id="login-screen">
+    <div class="login-card">
+      <h1 class="login-title">🧸 Admin</h1>
+      <p class="login-sub">Baby Shower · Alexander Jared</p>
+      <form class="login-form" id="login-form">
+        <div class="field">
+          <label for="email">Email</label>
+          <input type="email" id="email" autocomplete="email" required />
+        </div>
+        <div class="field">
+          <label for="pwd">Contraseña</label>
+          <div class="pwd-wrap">
+            <input type="password" id="pwd" autocomplete="current-password" required />
+            <button type="button" class="pwd-toggle" data-target="pwd" aria-label="Mostrar contraseña">👁️</button>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary" id="login-btn">Entrar</button>
+        <p class="form-error" id="login-error"></p>
+        <p style="text-align:center; margin-top:8px;">
+          <a href="#" id="forgot-link" style="font-size:13px; color:var(--rojo); text-decoration:none; font-weight:600;">¿Olvidaste tu contraseña?</a>
+        </p>
+      </form>
+    </div>
+  </div>
+
+  <!-- ====== MODAL FORGOT PASSWORD ====== -->
+  <div class="modal-backdrop hidden" id="modal-forgot">
+    <div class="modal">
+      <h2 class="modal-title">Recuperar contraseña</h2>
+      <p style="font-size:13px; color:var(--gris); margin-bottom:14px;">
+        Te mandamos un correo con un link para que crees una contraseña nueva.
+      </p>
+      <form id="forgot-form">
+        <div class="field">
+          <label for="forgot-email">Tu email</label>
+          <input type="email" id="forgot-email" autocomplete="email" required />
+        </div>
+        <p class="form-error" id="forgot-error"></p>
+        <div class="modal-actions">
+          <button type="button" class="btn" id="forgot-cancel">Cancelar</button>
+          <button type="submit" class="btn btn-primary" id="forgot-send">Enviar correo</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ====== DASHBOARD ====== -->
+  <div class="wrap hidden" id="dashboard">
+    <header class="header">
+      <h1>🍼 Baby Shower AJ · Admin</h1>
+      <div class="header-actions">
+        <span class="user-email" id="user-email"></span>
+        <button class="btn btn-ghost" id="btn-settings" title="Ajustes">⚙️ Ajustes</button>
+        <button class="btn btn-ghost" id="btn-logout">Salir</button>
+      </div>
+    </header>
+
+    <div class="stats">
+      <div class="stat-card confirmed">
+        <div class="stat-label">Confirmados</div>
+        <div class="stat-value" id="stat-confirmed">0</div>
+        <div class="stat-extra" id="stat-confirmed-extra">0 personas</div>
+      </div>
+      <div class="stat-card declined">
+        <div class="stat-label">No asistirán</div>
+        <div class="stat-value" id="stat-declined">0</div>
+        <div class="stat-extra">grupos</div>
+      </div>
+      <div class="stat-card pending">
+        <div class="stat-label">Pendientes</div>
+        <div class="stat-value" id="stat-pending">0</div>
+        <div class="stat-extra">sin responder</div>
+      </div>
+      <div class="stat-card sent">
+        <div class="stat-label">WhatsApp enviados</div>
+        <div class="stat-value" id="stat-sent">0</div>
+        <div class="stat-extra" id="stat-sent-extra">de 0 grupos</div>
+      </div>
+    </div>
+
+    <div class="progress-card">
+      <div class="progress-row">
+        <span id="progress-text">0% respondieron</span>
+        <span id="progress-people">0 / 0 personas</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+    </div>
+
+    <div class="toolbar">
+      <input type="search" id="search" placeholder="Buscar por nombre…" />
+      <select id="filter">
+        <option value="all">Todos</option>
+        <option value="pendiente">Pendientes</option>
+        <option value="confirmado">Confirmados</option>
+        <option value="declinado">No asistirán</option>
+        <option value="not-sent">No enviados</option>
+        <option value="sent">Enviados</option>
+        <option value="no-phone">Sin teléfono</option>
+      </select>
+      <button class="btn btn-primary" id="btn-add">+ Agregar</button>
+    </div>
+
+    <div id="invitados-list">
+      <div class="loader">Cargando invitados…</div>
+    </div>
+  </div>
+
+  <!-- ====== MODAL EDIT/ADD ====== -->
+  <div class="modal-backdrop hidden" id="modal-edit">
+    <div class="modal">
+      <h2 class="modal-title" id="edit-title">Agregar invitado</h2>
+      <form id="edit-form">
+        <div class="field">
+          <label for="edit-nombre">Nombre del grupo</label>
+          <input type="text" id="edit-nombre" required maxlength="60" />
+        </div>
+        <div class="field">
+          <label for="edit-telefono">Teléfono (opcional)</label>
+          <input type="tel" id="edit-telefono" placeholder="+503 7777 7777" />
+          <span class="field-hint">Si tiene 8 dígitos se asume +503. Sin teléfono el botón de WhatsApp pide a quién mandar.</span>
+        </div>
+        <div class="field">
+          <label for="edit-personasMax">Cantidad de personas</label>
+          <input type="number" id="edit-personasMax" min="1" max="20" value="1" required />
+        </div>
+        <div class="field">
+          <label for="edit-genero">Género (para textos)</label>
+          <select id="edit-genero">
+            <option value="masculino">Masculino</option>
+            <option value="femenino">Femenino</option>
+            <option value="plural">Plural / Familia</option>
+          </select>
+        </div>
+        <p class="form-error" id="edit-error"></p>
+        <div class="modal-actions">
+          <button type="button" class="btn" id="edit-cancel">Cancelar</button>
+          <button type="submit" class="btn btn-primary" id="edit-save">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ====== MODAL DELETE ====== -->
+  <div class="modal-backdrop hidden" id="modal-delete">
+    <div class="modal">
+      <h2 class="modal-title">¿Eliminar invitado?</h2>
+      <p>Vas a eliminar a <strong id="delete-name"></strong>. Esta acción no se puede deshacer.</p>
+      <div class="modal-actions">
+        <button type="button" class="btn" id="delete-cancel">Cancelar</button>
+        <button type="button" class="btn btn-danger" id="delete-confirm">Eliminar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== MODAL SETTINGS ====== -->
+  <div class="modal-backdrop hidden" id="modal-settings">
+    <div class="modal" style="max-width: 480px;">
+      <h2 class="modal-title">⚙️ Ajustes</h2>
+
+      <!-- Cambiar password -->
+      <details class="settings-section" open>
+        <summary>🔑 Cambiar mi contraseña</summary>
+        <form id="pwd-form" class="settings-body">
+          <div class="field">
+            <label for="pwd-current">Contraseña actual</label>
+            <div class="pwd-wrap">
+              <input type="password" id="pwd-current" autocomplete="current-password" required />
+              <button type="button" class="pwd-toggle" data-target="pwd-current" aria-label="Mostrar contraseña">👁️</button>
+            </div>
+          </div>
+          <div class="field">
+            <label for="pwd-new">Nueva contraseña</label>
+            <div class="pwd-wrap">
+              <input type="password" id="pwd-new" autocomplete="new-password" minlength="6" required />
+              <button type="button" class="pwd-toggle" data-target="pwd-new" aria-label="Mostrar contraseña">👁️</button>
+            </div>
+            <span class="field-hint">Mínimo 6 caracteres.</span>
+          </div>
+          <div class="field">
+            <label for="pwd-new2">Confirmar nueva</label>
+            <div class="pwd-wrap">
+              <input type="password" id="pwd-new2" autocomplete="new-password" minlength="6" required />
+              <button type="button" class="pwd-toggle" data-target="pwd-new2" aria-label="Mostrar contraseña">👁️</button>
+            </div>
+          </div>
+          <p class="form-error" id="pwd-error"></p>
+          <button type="submit" class="btn btn-primary" id="pwd-save">Cambiar contraseña</button>
+        </form>
+      </details>
+
+      <!-- Gestión de admins -->
+      <details class="settings-section" open>
+        <summary>👥 Administradores</summary>
+        <div class="settings-body">
+          <p class="field-hint" style="margin-bottom:10px">
+            Para sumar a alguien: primero creá su cuenta en
+            <a href="https://console.firebase.google.com/project/santiago-cumple-zvx85q/authentication/users" target="_blank" rel="noopener">Firebase Auth</a>,
+            copiá su UID y pegalo abajo.
+          </p>
+          <div id="admins-list"></div>
+          <button type="button" class="btn btn-yellow" id="btn-add-admin" style="width:100%; margin-top:10px;">+ Agregar admin</button>
+        </div>
+      </details>
+
+      <div class="modal-actions">
+        <button type="button" class="btn" id="settings-close" style="flex:1">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== MODAL ADD/REMOVE ADMIN ====== -->
+  <div class="modal-backdrop hidden" id="modal-admin-add">
+    <div class="modal">
+      <h2 class="modal-title">Agregar admin</h2>
+      <form id="admin-add-form">
+        <div class="field">
+          <label for="admin-uid">UID del usuario</label>
+          <input type="text" id="admin-uid" required minlength="8" placeholder="abcDEF123..." />
+          <span class="field-hint">Lo encontrás en Firebase Console → Authentication → la fila del usuario.</span>
+        </div>
+        <div class="field">
+          <label for="admin-email">Email</label>
+          <input type="email" id="admin-email" required />
+        </div>
+        <div class="field">
+          <label for="admin-nombre">Nombre (opcional)</label>
+          <input type="text" id="admin-nombre" maxlength="60" />
+        </div>
+        <p class="form-error" id="admin-add-error"></p>
+        <div class="modal-actions">
+          <button type="button" class="btn" id="admin-add-cancel">Cancelar</button>
+          <button type="submit" class="btn btn-primary" id="admin-add-save">Agregar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal-backdrop hidden" id="modal-admin-delete">
+    <div class="modal">
+      <h2 class="modal-title">¿Quitar admin?</h2>
+      <p><strong id="admin-delete-name"></strong> ya no podrá entrar al panel.</p>
+      <div class="modal-actions">
+        <button type="button" class="btn" id="admin-delete-cancel">Cancelar</button>
+        <button type="button" class="btn btn-danger" id="admin-delete-confirm">Quitar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast hidden" id="toast" role="status" aria-live="polite"></div>
+
+  <script type="module">
+    import { db, auth, LEGACY_ADMIN_UID } from './firebase-config.js';
+    import {
+      ref, get, set, update, remove, onValue, off
+    } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
+    import {
+      signInWithEmailAndPassword,
+      signOut,
+      onAuthStateChanged,
+      setPersistence,
+      browserLocalPersistence,
+      EmailAuthProvider,
+      reauthenticateWithCredential,
+      updatePassword,
+      sendPasswordResetEmail
+    } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+
+    const $ = (s) => document.querySelector(s);
+
+    // ---- State ----
+    let invitados = {};
+    let admins = {};
+    let evento = null;
+    let invitadosUnsub = null;
+    let adminsUnsub = null;
+    let editingId = null;
+    let pendingDeleteId = null;
+    let pendingDeleteAdminUid = null;
+    let currentUser = null;
+
+    const SITE_BASE = 'https://njar97.github.io/baby-aj';
+
+    // ---- Helpers ----
+    const ALPHABET = '23456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+    function genId(len = 8) {
+      let s = '';
+      for (let i = 0; i < len; i++) s += ALPHABET[Math.floor(Math.random() * ALPHABET.length)];
+      return s;
+    }
+
+    function normalizePhone(p) {
+      if (!p) return '';
+      const cleaned = String(p).replace(/[^\d+]/g, '');
+      let digits = cleaned.replace(/^\+/, '');
+      if (digits.length === 8) digits = '503' + digits;
+      return digits;
+    }
+
+    function buildWaMessage(nombre, id) {
+      const url = `${SITE_BASE}/?id=${id}`;
+      return `¡Hola ${nombre}! 🍼
+
+Estamos celebrando la llegada de Alexander Jared con un Baby Shower y queremos que nos acompañes 🧸
+
+📅 Domingo 26 de julio · 2:00 pm
+📍 Col. Montevideo, Av. Salarrué, Block C, casa #7
+
+👇 Tocá este link para confirmar tu lugar (¡solo toma un segundo!):
+${url}
+
+¡Te esperamos! ⭐`;
+    }
+
+    function buildWaLink(inv) {
+      const phone = normalizePhone(inv.telefono);
+      const msg = buildWaMessage(inv.nombre, inv.id);
+      const base = phone ? `https://wa.me/${phone}` : `https://wa.me/`;
+      return `${base}?text=${encodeURIComponent(msg)}`;
+    }
+
+    function escapeHtml(s) {
+      return String(s ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+    }
+
+    function formatDate(ts) {
+      if (!ts) return '';
+      const d = new Date(ts);
+      return `${d.getDate()}/${d.getMonth()+1}`;
+    }
+
+    function showToast(msg, type = '', ms = 2800) {
+      const t = $('#toast');
+      t.textContent = msg;
+      t.className = 'toast ' + type;
+      t.classList.remove('hidden');
+      clearTimeout(showToast._t);
+      showToast._t = setTimeout(() => t.classList.add('hidden'), ms);
+    }
+
+    // ---- Auth ----
+    setPersistence(auth, browserLocalPersistence).catch(console.error);
+
+    async function ensureAdminEntry(user) {
+      // Lee /admins/{uid}. Si no existe pero el UID es el legacy, lo auto-migra.
+      // Devuelve true si el usuario es admin (en /admins).
+      try {
+        const snap = await get(ref(db, '/admins/' + user.uid));
+        if (snap.exists()) return true;
+        if (user.uid === LEGACY_ADMIN_UID) {
+          await set(ref(db, '/admins/' + user.uid), {
+            email: user.email || 'legacy',
+            nombre: 'Admin original',
+            agregado: Date.now()
+          });
+          return true;
+        }
+        return false;
+      } catch (err) {
+        console.error('admin check failed', err);
+        return false;
+      }
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        currentUser = null;
+        $('#dashboard').classList.add('hidden');
+        $('#login-screen').classList.remove('hidden');
+        stopListening();
+        return;
+      }
+      const isAdmin = await ensureAdminEntry(user);
+      if (!isAdmin) {
+        await signOut(auth);
+        $('#login-error').textContent = 'Esta cuenta no tiene permisos de admin.';
+        return;
+      }
+      currentUser = user;
+      $('#login-screen').classList.add('hidden');
+      $('#dashboard').classList.remove('hidden');
+      $('#user-email').textContent = user.email || '';
+      startListening();
+    });
+
+    $('#login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = $('#email').value.trim();
+      const pwd = $('#pwd').value;
+      const btn = $('#login-btn');
+      $('#login-error').textContent = '';
+      btn.disabled = true;
+      try {
+        await signInWithEmailAndPassword(auth, email, pwd);
+        $('#pwd').value = '';
+      } catch (err) {
+        const msg = {
+          'auth/invalid-credential': 'Credenciales incorrectas.',
+          'auth/wrong-password': 'Credenciales incorrectas.',
+          'auth/user-not-found': 'Credenciales incorrectas.',
+          'auth/too-many-requests': 'Demasiados intentos. Esperá unos minutos.',
+          'auth/network-request-failed': 'Sin conexión.'
+        }[err.code] || 'Error: ' + (err.code || err.message);
+        $('#login-error').textContent = msg;
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    $('#btn-logout').addEventListener('click', () => signOut(auth));
+
+    // ---- Toggle ojo en campos de contraseña ----
+    document.addEventListener('click', (e) => {
+      const t = e.target.closest('.pwd-toggle');
+      if (!t) return;
+      const inp = document.getElementById(t.dataset.target);
+      if (!inp) return;
+      const showing = inp.type === 'text';
+      inp.type = showing ? 'password' : 'text';
+      t.textContent = showing ? '👁️' : '🙈';
+      t.setAttribute('aria-label', showing ? 'Mostrar contraseña' : 'Ocultar contraseña');
+    });
+
+    // ---- Forgot password ----
+    $('#forgot-link').addEventListener('click', (e) => {
+      e.preventDefault();
+      $('#forgot-email').value = $('#email').value || '';
+      $('#forgot-error').textContent = '';
+      $('#forgot-error').className = 'form-error';
+      $('#modal-forgot').classList.remove('hidden');
+      setTimeout(() => $('#forgot-email').focus(), 50);
+    });
+    $('#forgot-cancel').addEventListener('click', () => {
+      $('#modal-forgot').classList.add('hidden');
+    });
+    $('#modal-forgot').addEventListener('click', (e) => {
+      if (e.target === e.currentTarget) $('#modal-forgot').classList.add('hidden');
+    });
+    $('#forgot-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = $('#forgot-email').value.trim();
+      const errEl = $('#forgot-error');
+      errEl.className = 'form-error';
+      errEl.textContent = '';
+      if (!email) { errEl.textContent = 'Ingresá tu email.'; return; }
+      const btn = $('#forgot-send');
+      btn.disabled = true;
+      try {
+        await sendPasswordResetEmail(auth, email);
+        errEl.className = 'form-success';
+        errEl.textContent = '✓ Correo enviado. Revisá tu bandeja (y spam por si acaso).';
+      } catch (err) {
+        const msg = {
+          'auth/invalid-email': 'Email inválido.',
+          'auth/user-not-found': 'No hay cuenta con ese email.',
+          'auth/too-many-requests': 'Demasiados intentos. Esperá unos minutos.'
+        }[err.code] || 'Error: ' + (err.code || err.message);
+        errEl.textContent = msg;
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    // ---- Data load ----
+    function startListening() {
+      if (invitadosUnsub) return;
+      const rInv = ref(db, '/baby-shower-aj/invitados');
+      invitadosUnsub = onValue(rInv, (snap) => {
+        invitados = snap.val() || {};
+        render();
+      }, (err) => {
+        console.error('RTDB error', err);
+        showToast('Error al cargar datos: ' + err.message, 'error', 5000);
+      });
+
+      const rAdm = ref(db, '/admins');
+      adminsUnsub = onValue(rAdm, (snap) => {
+        admins = snap.val() || {};
+        renderAdminsList();
+      }, (err) => {
+        console.error('Admins read error', err);
+      });
+
+      get(ref(db, '/evento')).then(s => evento = s.val()).catch(() => {});
+    }
+
+    function stopListening() {
+      if (invitadosUnsub) {
+        off(ref(db, '/baby-shower-aj/invitados'));
+        invitadosUnsub = null;
+      }
+      if (adminsUnsub) {
+        off(ref(db, '/admins'));
+        adminsUnsub = null;
+      }
+      invitados = {};
+      admins = {};
+    }
+
+    // ---- Render ----
+    function render() {
+      renderStats();
+      renderList();
+    }
+
+    function renderStats() {
+      const list = Object.values(invitados);
+      const total = list.length;
+      const confirmados = list.filter(i => i.estado === 'confirmado');
+      const declinados  = list.filter(i => i.estado === 'declinado');
+      const pendientes  = list.filter(i => !i.estado || i.estado === 'pendiente');
+      const enviados    = list.filter(i => i.enviadoEn);
+
+      const personasConfirmadas = confirmados.reduce((s, i) => s + (i.personasConfirmadas || 0), 0);
+      const totalPersonasMax    = list.reduce((s, i) => s + (i.personasMax || 0), 0);
+
+      $('#stat-confirmed').textContent = confirmados.length;
+      $('#stat-confirmed-extra').textContent = `${personasConfirmadas} ${personasConfirmadas === 1 ? 'persona' : 'personas'}`;
+      $('#stat-declined').textContent = declinados.length;
+      $('#stat-pending').textContent = pendientes.length;
+      $('#stat-sent').textContent = enviados.length;
+      $('#stat-sent-extra').textContent = `de ${total} ${total === 1 ? 'grupo' : 'grupos'}`;
+
+      const respondidos = confirmados.length + declinados.length;
+      const pct = total ? Math.round((respondidos / total) * 100) : 0;
+      $('#progress-fill').style.width = pct + '%';
+      $('#progress-text').textContent = `${pct}% respondieron · ${respondidos} de ${total} grupos`;
+      $('#progress-people').textContent = `${personasConfirmadas} / ${totalPersonasMax} personas`;
+    }
+
+    function renderList() {
+      const filter = $('#filter').value;
+      const search = $('#search').value.trim().toLowerCase();
+
+      const list = Object.entries(invitados)
+        .map(([id, data]) => ({ ...data, id }))
+        .filter(i => {
+          if (filter === 'pendiente'  && i.estado && i.estado !== 'pendiente') return false;
+          if (filter === 'confirmado' && i.estado !== 'confirmado') return false;
+          if (filter === 'declinado'  && i.estado !== 'declinado') return false;
+          if (filter === 'not-sent'   && i.enviadoEn) return false;
+          if (filter === 'sent'       && !i.enviadoEn) return false;
+          if (filter === 'no-phone'   && i.telefono && String(i.telefono).trim().length > 0) return false;
+          if (search && !(i.nombre || '').toLowerCase().includes(search)) return false;
+          return true;
+        })
+        .sort((a, b) => {
+          // Pendientes y no enviados primero, luego alfabético
+          const aRank = (a.enviadoEn ? 1 : 0) + (a.estado === 'pendiente' || !a.estado ? 0 : 2);
+          const bRank = (b.enviadoEn ? 1 : 0) + (b.estado === 'pendiente' || !b.estado ? 0 : 2);
+          if (aRank !== bRank) return aRank - bRank;
+          return (a.nombre || '').localeCompare(b.nombre || '');
+        });
+
+      const container = $('#invitados-list');
+      if (!list.length) {
+        container.innerHTML = `<div class="empty">No hay invitados que coincidan con el filtro.</div>`;
+        return;
+      }
+
+      container.innerHTML = list.map(renderCard).join('');
+    }
+
+    function renderCard(i) {
+      const estado = i.estado || 'pendiente';
+      const estadoTxt = {
+        pendiente:  '⏳ Sin responder',
+        confirmado: `✅ Confirmado · ${i.personasConfirmadas || 0}/${i.personasMax} personas`,
+        declinado:  '❌ No asistirá'
+      }[estado];
+
+      const enviadoBadge = i.enviadoEn
+        ? `<span class="badge badge-enviado">✓ Enviado ${formatDate(i.enviadoEn)}</span>`
+        : `<span class="badge badge-no-enviado">Sin enviar</span>`;
+
+      const respondidoTxt = i.respondidoEn
+        ? `<span>· respondió ${formatDate(i.respondidoEn)}</span>`
+        : '';
+
+      const tel = i.telefono
+        ? escapeHtml(i.telefono)
+        : '<em style="color:#bbb">sin teléfono</em>';
+
+      const wa = i.enviadoEn ? '↻ Re-enviar' : '📱 WhatsApp';
+      const waCls = i.enviadoEn ? 'btn-wa sent' : 'btn-wa';
+
+      const undoBtn = i.enviadoEn
+        ? `<button data-action="undo" data-id="${i.id}">↺ Des-marcar</button>`
+        : '';
+
+      const nLabel = i.personasMax === 1 ? '1 persona' : `${i.personasMax} personas`;
+      const quickActions = estado === 'confirmado'
+        ? `<div class="quick-actions">
+             <button class="btn-q-no" data-action="quick-decline" data-id="${i.id}">❌ Marcar que no va</button>
+           </div>`
+        : estado === 'declinado'
+        ? `<div class="quick-actions">
+             <button class="btn-q-yes" data-action="quick-confirm" data-id="${i.id}">✅ Confirmó · ${nLabel}</button>
+           </div>`
+        : `<div class="quick-actions">
+             <button class="btn-q-yes" data-action="quick-confirm" data-id="${i.id}">✅ Confirmó · ${nLabel}</button>
+             <button class="btn-q-no"  data-action="quick-decline" data-id="${i.id}">❌ No va</button>
+           </div>`;
+
+      return `
+        <div class="invitado-card estado-${estado}">
+          <div class="inv-top">
+            <div class="inv-info">
+              <h3>${escapeHtml(i.nombre)}</h3>
+              <div class="inv-meta">
+                <span>${tel}</span>
+                <span>· ${i.personasMax} ${i.personasMax === 1 ? 'persona' : 'personas'}</span>
+                ${respondidoTxt}
+              </div>
+            </div>
+            <div class="badges">
+              <span class="badge badge-${estado}">${estadoTxt}</span>
+              ${enviadoBadge}
+            </div>
+          </div>
+          ${quickActions}
+          <div class="inv-actions">
+            <button class="${waCls}" data-action="wa" data-id="${i.id}">${wa}</button>
+            ${undoBtn}
+            <button data-action="copy" data-id="${i.id}">🔗 Copiar link</button>
+            <button data-action="edit" data-id="${i.id}">✏️ Editar</button>
+            <button class="btn-del" data-action="delete" data-id="${i.id}">🗑️</button>
+          </div>
+        </div>
+      `;
+    }
+
+    // ---- Action delegation ----
+    $('#invitados-list').addEventListener('click', async (e) => {
+      const btn = e.target.closest('button[data-action]');
+      if (!btn) return;
+      const action = btn.dataset.action;
+      const id = btn.dataset.id;
+      const inv = { ...invitados[id], id };
+      if (!invitados[id]) return;
+
+      if (action === 'wa') {
+        // Abrir WhatsApp PRIMERO (mismo tick del click, sin await previo)
+        // para no perder el user-gesture en Safari iOS / Chrome móvil.
+        // El marcado de enviadoEn corre en background.
+        const link = buildWaLink(inv);
+        window.open(link, '_blank', 'noopener');
+        update(ref(db, '/baby-shower-aj/invitados/' + id), { enviadoEn: Date.now() })
+          .catch(err => {
+            console.error(err);
+            showToast('No se pudo marcar como enviado', 'error');
+          });
+      }
+
+      if (action === 'quick-confirm') {
+        const n = inv.personasMax;
+        btn.disabled = true;
+        try {
+          await update(ref(db, '/baby-shower-aj/invitados/' + id), {
+            estado: 'confirmado',
+            personasConfirmadas: n,
+            respondidoEn: Date.now()
+          });
+          showToast(`✅ ${inv.nombre} confirmado · ${n} ${n === 1 ? 'persona' : 'personas'}`, 'success');
+        } catch (err) {
+          console.error(err);
+          showToast('Error: ' + err.message, 'error');
+          btn.disabled = false;
+        }
+      }
+
+      if (action === 'quick-decline') {
+        btn.disabled = true;
+        try {
+          await update(ref(db, '/baby-shower-aj/invitados/' + id), {
+            estado: 'declinado',
+            personasConfirmadas: 0,
+            respondidoEn: Date.now()
+          });
+          showToast(`❌ ${inv.nombre} marcado como no va`);
+        } catch (err) {
+          console.error(err);
+          showToast('Error: ' + err.message, 'error');
+          btn.disabled = false;
+        }
+      }
+
+      if (action === 'undo') {
+        try {
+          await update(ref(db, '/baby-shower-aj/invitados/' + id), { enviadoEn: null });
+          showToast('Marcado como no enviado');
+        } catch (err) {
+          console.error(err);
+          showToast('Error: ' + err.message, 'error');
+        }
+      }
+
+      if (action === 'copy') {
+        const url = `${SITE_BASE}/?id=${id}`;
+        try {
+          await navigator.clipboard.writeText(url);
+          showToast('Link copiado: ' + url, 'success');
+        } catch {
+          showToast(url, '', 5000);
+        }
+      }
+
+      if (action === 'edit') {
+        openEditModal(id);
+      }
+
+      if (action === 'delete') {
+        pendingDeleteId = id;
+        $('#delete-name').textContent = inv.nombre;
+        $('#modal-delete').classList.remove('hidden');
+      }
+    });
+
+    // ---- Edit / add modal ----
+    function openEditModal(id) {
+      editingId = id;
+      const inv = id ? invitados[id] : null;
+      $('#edit-title').textContent = id ? 'Editar invitado' : 'Agregar invitado';
+      $('#edit-nombre').value      = inv?.nombre || '';
+      $('#edit-telefono').value    = inv?.telefono || '';
+      $('#edit-personasMax').value = inv?.personasMax || 1;
+      $('#edit-genero').value      = inv?.genero || 'masculino';
+      $('#edit-error').textContent = '';
+      $('#modal-edit').classList.remove('hidden');
+      setTimeout(() => $('#edit-nombre').focus(), 50);
+    }
+
+    function closeEditModal() {
+      $('#modal-edit').classList.add('hidden');
+      editingId = null;
+    }
+
+    $('#btn-add').addEventListener('click', () => openEditModal(null));
+    $('#edit-cancel').addEventListener('click', closeEditModal);
+    $('#modal-edit').addEventListener('click', (e) => {
+      if (e.target === e.currentTarget) closeEditModal();
+    });
+
+    $('#edit-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const nombre   = $('#edit-nombre').value.trim();
+      const telefono = $('#edit-telefono').value.trim();
+      const personasMax = Number($('#edit-personasMax').value);
+      const genero   = $('#edit-genero').value;
+
+      if (!nombre) {
+        $('#edit-error').textContent = 'El nombre es requerido.';
+        return;
+      }
+      if (!Number.isInteger(personasMax) || personasMax < 1 || personasMax > 20) {
+        $('#edit-error').textContent = 'Cantidad inválida (1-20).';
+        return;
+      }
+
+      const btn = $('#edit-save');
+      btn.disabled = true;
+      try {
+        if (editingId) {
+          await update(ref(db, '/baby-shower-aj/invitados/' + editingId), {
+            nombre, telefono, personasMax, genero
+          });
+          showToast('Invitado actualizado', 'success');
+        } else {
+          let newId = genId();
+          while (invitados[newId]) newId = genId();
+          await set(ref(db, '/baby-shower-aj/invitados/' + newId), {
+            nombre,
+            telefono,
+            personasMax,
+            genero,
+            estado: 'pendiente',
+            personasConfirmadas: 0,
+            creadoEn: Date.now()
+          });
+          showToast('Invitado agregado', 'success');
+        }
+        closeEditModal();
+      } catch (err) {
+        console.error(err);
+        $('#edit-error').textContent = 'Error: ' + err.message;
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    // ---- Delete modal ----
+    $('#delete-cancel').addEventListener('click', () => {
+      $('#modal-delete').classList.add('hidden');
+      pendingDeleteId = null;
+    });
+    $('#modal-delete').addEventListener('click', (e) => {
+      if (e.target === e.currentTarget) {
+        $('#modal-delete').classList.add('hidden');
+        pendingDeleteId = null;
+      }
+    });
+    $('#delete-confirm').addEventListener('click', async () => {
+      if (!pendingDeleteId) return;
+      const btn = $('#delete-confirm');
+      btn.disabled = true;
+      try {
+        await remove(ref(db, '/baby-shower-aj/invitados/' + pendingDeleteId));
+        showToast('Invitado eliminado', 'success');
+        $('#modal-delete').classList.add('hidden');
+        pendingDeleteId = null;
+      } catch (err) {
+        console.error(err);
+        showToast('Error: ' + err.message, 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    // ---- Search & filter ----
+    $('#search').addEventListener('input', renderList);
+    $('#filter').addEventListener('change', renderList);
+
+    // ====== SETTINGS ======
+    function openSettings() {
+      // limpiar forms
+      $('#pwd-current').value = '';
+      $('#pwd-new').value = '';
+      $('#pwd-new2').value = '';
+      $('#pwd-error').textContent = '';
+      $('#pwd-error').className = 'form-error';
+      renderAdminsList();
+      $('#modal-settings').classList.remove('hidden');
+    }
+    function closeSettings() {
+      $('#modal-settings').classList.add('hidden');
+    }
+    $('#btn-settings').addEventListener('click', openSettings);
+    $('#settings-close').addEventListener('click', closeSettings);
+    $('#modal-settings').addEventListener('click', (e) => {
+      if (e.target === e.currentTarget) closeSettings();
+    });
+
+    // ---- Cambiar password ----
+    $('#pwd-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const cur  = $('#pwd-current').value;
+      const nw   = $('#pwd-new').value;
+      const nw2  = $('#pwd-new2').value;
+      const err  = $('#pwd-error');
+      err.className = 'form-error';
+      err.textContent = '';
+
+      if (nw.length < 6) { err.textContent = 'La nueva contraseña debe tener al menos 6 caracteres.'; return; }
+      if (nw !== nw2)    { err.textContent = 'Las contraseñas nuevas no coinciden.'; return; }
+      if (!currentUser?.email) { err.textContent = 'Sesión inválida.'; return; }
+
+      const btn = $('#pwd-save');
+      btn.disabled = true;
+      try {
+        const cred = EmailAuthProvider.credential(currentUser.email, cur);
+        await reauthenticateWithCredential(currentUser, cred);
+        await updatePassword(currentUser, nw);
+        err.className = 'form-success';
+        err.textContent = '✓ Contraseña actualizada. Recordá guardarla en un lugar seguro.';
+        $('#pwd-current').value = '';
+        $('#pwd-new').value = '';
+        $('#pwd-new2').value = '';
+        showToast('Contraseña cambiada', 'success');
+      } catch (e2) {
+        const msg = {
+          'auth/invalid-credential': 'La contraseña actual es incorrecta.',
+          'auth/wrong-password': 'La contraseña actual es incorrecta.',
+          'auth/weak-password': 'La nueva contraseña es muy débil.',
+          'auth/too-many-requests': 'Demasiados intentos. Esperá unos minutos.',
+          'auth/requires-recent-login': 'Cerrá sesión y volvé a entrar antes de cambiar la contraseña.'
+        }[e2.code] || 'Error: ' + (e2.code || e2.message);
+        err.textContent = msg;
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    // ---- Render lista de admins ----
+    function renderAdminsList() {
+      const cont = $('#admins-list');
+      if (!cont) return;
+      const list = Object.entries(admins)
+        .map(([uid, data]) => ({ uid, ...data }))
+        .sort((a, b) => (a.agregado || 0) - (b.agregado || 0));
+      if (!list.length) {
+        cont.innerHTML = '<p class="field-hint">No hay administradores registrados.</p>';
+        return;
+      }
+      cont.innerHTML = list.map(a => {
+        const isYou = currentUser && a.uid === currentUser.uid;
+        const removeBtn = isYou
+          ? ''
+          : `<button data-action="admin-remove" data-uid="${escapeHtml(a.uid)}">Quitar</button>`;
+        return `
+          <div class="admin-row">
+            <div class="admin-info">
+              <div class="name">
+                ${escapeHtml(a.nombre || a.email || 'Sin nombre')}
+                ${isYou ? '<span class="you-pill">VOS</span>' : ''}
+              </div>
+              ${a.email && a.email !== a.nombre ? `<div class="email">${escapeHtml(a.email)}</div>` : ''}
+              <div class="uid">${escapeHtml(a.uid)}</div>
+            </div>
+            ${removeBtn}
+          </div>
+        `;
+      }).join('');
+    }
+
+    $('#admins-list').addEventListener('click', (e) => {
+      const btn = e.target.closest('button[data-action="admin-remove"]');
+      if (!btn) return;
+      const uid = btn.dataset.uid;
+      const a = admins[uid];
+      if (!a) return;
+      pendingDeleteAdminUid = uid;
+      $('#admin-delete-name').textContent = a.nombre || a.email || uid;
+      $('#modal-admin-delete').classList.remove('hidden');
+    });
+
+    // ---- Agregar admin ----
+    $('#btn-add-admin').addEventListener('click', () => {
+      $('#admin-uid').value = '';
+      $('#admin-email').value = '';
+      $('#admin-nombre').value = '';
+      $('#admin-add-error').textContent = '';
+      $('#modal-admin-add').classList.remove('hidden');
+      setTimeout(() => $('#admin-uid').focus(), 50);
+    });
+    $('#admin-add-cancel').addEventListener('click', () => {
+      $('#modal-admin-add').classList.add('hidden');
+    });
+    $('#modal-admin-add').addEventListener('click', (e) => {
+      if (e.target === e.currentTarget) $('#modal-admin-add').classList.add('hidden');
+    });
+    $('#admin-add-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const uid    = $('#admin-uid').value.trim();
+      const email  = $('#admin-email').value.trim();
+      const nombre = $('#admin-nombre').value.trim();
+      const errEl  = $('#admin-add-error');
+      errEl.textContent = '';
+
+      if (uid.length < 8) { errEl.textContent = 'UID inválido.'; return; }
+      if (!email)         { errEl.textContent = 'El email es requerido.'; return; }
+      if (admins[uid])    { errEl.textContent = 'Este UID ya está registrado.'; return; }
+
+      const btn = $('#admin-add-save');
+      btn.disabled = true;
+      try {
+        await set(ref(db, '/admins/' + uid), {
+          email,
+          nombre: nombre || email,
+          agregado: Date.now()
+        });
+        $('#modal-admin-add').classList.add('hidden');
+        showToast('Admin agregado', 'success');
+      } catch (e2) {
+        errEl.textContent = 'Error: ' + e2.message;
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    // ---- Quitar admin ----
+    $('#admin-delete-cancel').addEventListener('click', () => {
+      $('#modal-admin-delete').classList.add('hidden');
+      pendingDeleteAdminUid = null;
+    });
+    $('#modal-admin-delete').addEventListener('click', (e) => {
+      if (e.target === e.currentTarget) {
+        $('#modal-admin-delete').classList.add('hidden');
+        pendingDeleteAdminUid = null;
+      }
+    });
+    $('#admin-delete-confirm').addEventListener('click', async () => {
+      if (!pendingDeleteAdminUid) return;
+      if (currentUser && pendingDeleteAdminUid === currentUser.uid) {
+        showToast('No podés quitarte a vos mismo', 'error');
+        return;
+      }
+      const btn = $('#admin-delete-confirm');
+      btn.disabled = true;
+      try {
+        await remove(ref(db, '/admins/' + pendingDeleteAdminUid));
+        $('#modal-admin-delete').classList.add('hidden');
+        pendingDeleteAdminUid = null;
+        showToast('Admin removido', 'success');
+      } catch (e2) {
+        showToast('Error: ' + e2.message, 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    // ---- Esc cierra modales ----
+    document.addEventListener('keydown', (e) => {
+      if (e.key !== 'Escape') return;
+      if (!$('#modal-edit').classList.contains('hidden')) closeEditModal();
+      if (!$('#modal-delete').classList.contains('hidden')) {
+        $('#modal-delete').classList.add('hidden');
+        pendingDeleteId = null;
+      }
+      if (!$('#modal-admin-add').classList.contains('hidden')) {
+        $('#modal-admin-add').classList.add('hidden');
+      }
+      if (!$('#modal-admin-delete').classList.contains('hidden')) {
+        $('#modal-admin-delete').classList.add('hidden');
+        pendingDeleteAdminUid = null;
+      }
+      if (!$('#modal-settings').classList.contains('hidden')) closeSettings();
+      if (!$('#modal-forgot').classList.contains('hidden')) {
+        $('#modal-forgot').classList.add('hidden');
+      }
+    });
+  </script>
+</body>
+</html>

@@ -304,6 +304,48 @@
       100% { background-position: -200% 0; }
     }
 
+    /* ── Animaciones de entrada ── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity .7s ease, transform .7s ease;
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* ── Estrellitas flotantes de fondo ── */
+    .estrellas-bg { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+    .estrella-f {
+      position: absolute;
+      font-size: 14px;
+      opacity: 0.35;
+      animation: flotar linear infinite;
+    }
+    @keyframes flotar {
+      0%   { transform: translateY(105vh) rotate(0deg); }
+      100% { transform: translateY(-8vh) rotate(360deg); }
+    }
+    .container { position: relative; z-index: 1; }
+
+    /* ── Botón agregar al calendario ── */
+    .btn-cal {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 14px;
+      padding: 12px 22px;
+      border-radius: 999px;
+      background: var(--cafe-cl);
+      border: 2px solid var(--banda);
+      color: var(--cafe-d);
+      font-size: 14px;
+      font-weight: 700;
+      text-decoration: none;
+      font-family: 'Nunito', sans-serif;
+      cursor: pointer;
+      transition: transform .12s;
+    }
+    .btn-cal:active { transform: scale(0.97); }
+
     .hidden { display: none !important; }
     .error-card { text-align: center; }
     .error-title { font-family: 'Dancing Script', cursive; color: var(--cafe); font-size: 32px; }
@@ -316,28 +358,33 @@
   🍼 DEMO — Así se verá la invitación personalizada · Baby Shower Alexander Jared
 </div>
 
+<div class="estrellas-bg" id="estrellas-bg" aria-hidden="true"></div>
+
 <div class="container">
 
   <!-- HERO — nuevo diseño Canva (osito + nombre, sin texto repetido) -->
-  <div class="hero-img-wrap">
+  <div class="hero-img-wrap reveal">
     <img src="hero-aj.jpg" alt="Baby Shower Alexander Jared"/>
   </div>
 
   <!-- TÍTULO -->
-  <div class="hero" style="padding-top:18px;">
+  <div class="hero reveal" style="padding-top:18px;">
     <p class="acompananos">Acompáñanos al</p>
     <h1 class="titulo-evento">Baby Shower</h1>
   </div>
 
   <!-- FECHA, HORA, LUGAR -->
-  <div class="info-bloque">
+  <div class="info-bloque reveal">
     <p class="info-fecha">Julio 26 / 2:00 pm</p>
     <div class="divisor"><span style="font-size:16px;">⭐</span></div>
     <p class="info-lugar">
       Col. Montevideo, Av. Salarrué<br/>
       Block C, casa #7 · Frente a taller corea
     </p>
+    <br/>
     <a class="maps-link" href="https://maps.google.com/?q=Colonia+Montevideo+Avenida+Salarrue+El+Salvador" target="_blank" rel="noopener">📍 Ver en Maps →</a>
+    <br/>
+    <button class="btn-cal" id="btn-cal">📅 Agregar al calendario</button>
   </div>
 
   <!-- PARA (nombre del invitado, solo con ?id=) -->
@@ -348,7 +395,7 @@
   </div>
 
   <!-- COUNTDOWN -->
-  <div class="card">
+  <div class="card reveal">
     <div class="countdown-wrap">
       <p class="faltan-label">✦ Faltan ✦</p>
       <p class="countdown-num" id="dias">—</p>
@@ -461,6 +508,66 @@
   }
   actualizarContador();
   setInterval(actualizarContador, 60000);
+
+  // ── Estrellitas flotantes de fondo ──
+  (function() {
+    const bg = $('#estrellas-bg');
+    const symbols = ['⭐', '✦', '·', '⭐', '✧'];
+    for (let i = 0; i < 14; i++) {
+      const s = document.createElement('span');
+      s.className = 'estrella-f';
+      s.textContent = symbols[i % symbols.length];
+      s.style.left = Math.random() * 100 + 'vw';
+      s.style.fontSize = (10 + Math.random() * 12) + 'px';
+      s.style.animationDuration = (18 + Math.random() * 20) + 's';
+      s.style.animationDelay = (-Math.random() * 30) + 's';
+      bg.appendChild(s);
+    }
+  })();
+
+  // ── Animaciones de entrada al hacer scroll ──
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.15 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // ── Agregar al calendario ──
+  $('#btn-cal').addEventListener('click', () => {
+    const titulo = 'Baby Shower — Alexander Jared 🍼';
+    const lugar  = 'Col. Montevideo, Av. Salarrué, Block C, casa #7, frente a taller corea';
+    const isApple = /iPhone|iPad|Macintosh/.test(navigator.userAgent);
+    if (isApple) {
+      // iPhone/Mac: archivo .ics (hora local de El Salvador, sin TZ = hora del dispositivo)
+      const ics = [
+        'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//baby-aj//ES',
+        'BEGIN:VEVENT',
+        'DTSTART:20260726T140000',
+        'DTEND:20260726T170000',
+        `SUMMARY:${titulo}`,
+        `LOCATION:${lugar}`,
+        'BEGIN:VALARM', 'TRIGGER:-P1D', 'ACTION:DISPLAY', 'DESCRIPTION:Baby Shower mañana', 'END:VALARM',
+        'END:VEVENT', 'END:VCALENDAR'
+      ].join('\r\n');
+      const blob = new Blob([ics], { type: 'text/calendar' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'baby-shower-aj.ics';
+      a.click();
+      URL.revokeObjectURL(a.href);
+    } else {
+      // Android/PC: Google Calendar (UTC: 14:00 SV = 20:00 UTC)
+      const url = 'https://calendar.google.com/calendar/render?action=TEMPLATE'
+        + '&text=' + encodeURIComponent(titulo)
+        + '&dates=20260726T200000Z/20260726T230000Z'
+        + '&location=' + encodeURIComponent(lugar);
+      window.open(url, '_blank', 'noopener');
+    }
+  });
 
   function showToast(msg) {
     ui.toast.textContent = msg;
