@@ -287,6 +287,19 @@
     .btn-q-yes:hover { background: #C6EDE8; }
     .btn-q-no  { background: #FCE2E5; color: var(--rojo-osc); border-color: var(--rojo); }
     .btn-q-no:hover  { background: #F7C5CA; }
+    .btn-q-neutral { background: var(--crema-suave); color: var(--gris); border-color: var(--gris); font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 700; padding: 10px 14px; border-radius: 12px; cursor: pointer; flex: 1; border: 2px solid; transition: transform .06s; }
+    .btn-q-neutral:active { transform: translateY(1px); }
+    /* botón armado esperando segunda confirmación */
+    .quick-actions button.armed {
+      background: #FFB84D !important;
+      color: #5C3318 !important;
+      border-color: #B8860B !important;
+      animation: parpadeo 0.8s ease-in-out infinite;
+    }
+    @keyframes parpadeo {
+      0%, 100% { opacity: 1; }
+      50%      { opacity: 0.65; }
+    }
 
     /* ---- Botones generales ---- */
     .btn {
@@ -613,6 +626,7 @@
         <span id="progress-people">0 / 0 personas</span>
       </div>
       <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+      <div class="progress-row" id="lado-stats" style="margin-top:8px; margin-bottom:0;"></div>
     </div>
 
     <div class="toolbar">
@@ -1100,6 +1114,15 @@ ${url}
       $('#progress-fill').style.width = pct + '%';
       $('#progress-text').textContent = `${pct}% respondieron · ${respondidos} de ${total} grupos`;
       $('#progress-people').textContent = `${personasConfirmadas} / ${totalPersonasMax} personas`;
+
+      const statsLado = (lado) => {
+        const grupo = list.filter(i => i.lado === lado);
+        const conf  = grupo.filter(i => i.estado === 'confirmado');
+        const pers  = conf.reduce((s, i) => s + (i.personasConfirmadas || 0), 0);
+        return `${conf.length}/${grupo.length} grupos · ${pers} ✓`;
+      };
+      $('#lado-stats').innerHTML =
+        `<span>👥 Imelda: ${statsLado('imelda')}</span><span>👥 Mamá: ${statsLado('mama')}</span>`;
     }
 
     function renderList() {
@@ -1170,10 +1193,12 @@ ${url}
       const nLabel = i.personasMax === 1 ? '1 persona' : `${i.personasMax} personas`;
       const quickActions = estado === 'confirmado'
         ? `<div class="quick-actions">
-             <button class="btn-q-no" data-action="quick-decline" data-id="${i.id}">❌ Marcar que no va</button>
+             <button class="btn-q-neutral" data-action="quick-pending" data-id="${i.id}">↺ Volver a pendiente</button>
+             <button class="btn-q-no" data-action="quick-decline" data-id="${i.id}">❌ No va</button>
            </div>`
         : estado === 'declinado'
         ? `<div class="quick-actions">
+             <button class="btn-q-neutral" data-action="quick-pending" data-id="${i.id}">↺ Volver a pendiente</button>
              <button class="btn-q-yes" data-action="quick-confirm" data-id="${i.id}">✅ Confirmó · ${nLabel}</button>
            </div>`
         : `<div class="quick-actions">
@@ -1218,6 +1243,43 @@ ${url}
       const id = btn.dataset.id;
       const inv = { ...invitados[id], id };
       if (!invitados[id]) return;
+
+      // Doble toque para acciones de estado: el primer toque "arma" el botón,
+      // el segundo (dentro de 3.5s) ejecuta. Evita confirmaciones accidentales.
+      if (action === 'quick-confirm' || action === 'quick-decline' || action === 'quick-pending') {
+        if (btn.dataset.armed !== '1') {
+          btn.dataset.armed = '1';
+          btn.dataset.orig = btn.textContent;
+          btn.textContent = '¿Seguro? Tocá de nuevo';
+          btn.classList.add('armed');
+          setTimeout(() => {
+            if (btn.isConnected && btn.dataset.armed === '1') {
+              btn.dataset.armed = '';
+              btn.textContent = btn.dataset.orig;
+              btn.classList.remove('armed');
+            }
+          }, 3500);
+          return;
+        }
+        btn.dataset.armed = '';
+        btn.classList.remove('armed');
+      }
+
+      if (action === 'quick-pending') {
+        btn.disabled = true;
+        try {
+          await update(ref(db, '/baby-shower-aj/invitados/' + id), {
+            estado: 'pendiente',
+            personasConfirmadas: 0,
+            respondidoEn: null
+          });
+          showToast(`↺ ${inv.nombre} volvió a pendiente`);
+        } catch (err) {
+          console.error(err);
+          showToast('Error: ' + err.message, 'error');
+          btn.disabled = false;
+        }
+      }
 
       if (action === 'wa') {
         // Abrir WhatsApp PRIMERO (mismo tick del click, sin await previo)
