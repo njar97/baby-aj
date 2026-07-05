@@ -1362,7 +1362,7 @@ ${url}
 
       // Doble toque para acciones de estado: el primer toque "arma" el botón,
       // el segundo (dentro de 3.5s) ejecuta. Evita confirmaciones accidentales.
-      if (action === 'quick-confirm' || action === 'quick-decline' || action === 'quick-pending') {
+      if (action === 'quick-confirm' || action === 'quick-decline' || action === 'quick-pending' || action === 'undo') {
         if (btn.dataset.armed !== '1') {
           btn.dataset.armed = '1';
           btn.dataset.orig = btn.textContent;
