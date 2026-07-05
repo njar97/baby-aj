@@ -500,7 +500,8 @@
     <div class="thanks-emoji" id="thanks-emoji">🎉</div>
     <p class="thanks-title" id="thanks-title">¡Gracias!</p>
     <p class="thanks-text" id="thanks-text">Tu respuesta fue registrada.</p>
-    <button class="btn btn-change" id="btn-change">Cambiar respuesta</button>
+    <div class="rsvp-btns" id="thanks-extra" style="margin-top:18px;"></div>
+    <button class="btn btn-change" id="btn-change">Cambiar respuesta del grupo</button>
   </section>
 
   <!-- ERROR -->
@@ -779,7 +780,7 @@
   }
 
   async function guardar(estado, n, withConfetti) {
-    const allBtns = ui.rsvpSection.querySelectorAll('button');
+    const allBtns = document.querySelectorAll('#rsvp-section button, #thanks-card button');
     allBtns.forEach(b => b.disabled = true);
     try {
       await update(ref(db, `/${FB_PATH}/invitados/${id}`), { estado, personasConfirmadas: n, respondidoEn: Date.now() });
@@ -797,18 +798,43 @@
   function renderThanks() {
     ui.rsvpSection.classList.add('hidden');
     ui.thanksCard.classList.remove('hidden');
+    const max   = invitado.personasMax;
+    const extra = document.querySelector('#thanks-extra');
+    extra.innerHTML = '';
+
+    const mkBtn = (cls, text, fn) => {
+      const b = document.createElement('button');
+      b.className = 'btn ' + cls;
+      b.textContent = text;
+      b.addEventListener('click', fn);
+      return b;
+    };
+
     if (invitado.estado === 'confirmado') {
       const n = invitado.personasConfirmadas;
       ui.thanksEmoji.textContent = '🎉';
       ui.thanksTitle.textContent = n === 1 ? '¡Te esperamos!' : '¡Los esperamos!';
-      ui.thanksText.textContent  = n === 1
-        ? 'Tu asistencia fue confirmada. ¡Nos vemos el domingo 26 de julio!'
-        : `Confirmaste asistencia de ${n} personas. ¡Nos vemos el domingo 26 de julio!`;
+      if (max > 1) {
+        ui.thanksText.textContent = `Hay ${n} de ${max} lugares confirmados de tu grupo. ¡Nos vemos el domingo 26 de julio!`;
+        // otra persona del mismo grupo puede sumarse con el mismo link
+        if (n < max) {
+          extra.appendChild(mkBtn('btn-si', '➕ Yo también voy', () => guardar('confirmado', n + 1, true)));
+        }
+      } else {
+        ui.thanksText.textContent = 'Tu asistencia fue confirmada. ¡Nos vemos el domingo 26 de julio!';
+      }
     } else {
       ui.thanksEmoji.textContent = '🧸';
       ui.thanksTitle.textContent = 'Gracias por avisar';
-      ui.thanksText.textContent  = '¡Te vamos a extrañar! Si cambias de planes, podés volver aquí y actualizar tu respuesta.';
+      if (max > 1) {
+        ui.thanksText.textContent = 'Registramos que tu grupo no podrá asistir. Si alguien del grupo sí puede ir, puede confirmarse aquí abajo.';
+        extra.appendChild(mkBtn('btn-si', '✅ Yo sí voy', () => guardar('confirmado', 1, true)));
+      } else {
+        ui.thanksText.textContent = '¡Te vamos a extrañar! Si cambias de planes, podés volver aquí y actualizar tu respuesta.';
+      }
     }
+    ui.btnChange.disabled = false;
+    ui.btnChange.textContent = max > 1 ? 'Cambiar respuesta del grupo' : 'Cambiar respuesta';
     ui.btnChange.onclick = () => { ui.thanksCard.classList.add('hidden'); renderRsvp(); };
   }
 

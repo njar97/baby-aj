@@ -1191,8 +1191,16 @@ ${url}
         : '';
 
       const nLabel = i.personasMax === 1 ? '1 persona' : `${i.personasMax} personas`;
+      // stepper para ajustar cuántos confirmados (solo grupos >1 ya confirmados)
+      const stepper = (estado === 'confirmado' && i.personasMax > 1)
+        ? `<div class="quick-actions" style="align-items:center;">
+             <button class="btn-q-neutral" data-action="conf-minus" data-id="${i.id}" style="flex:0 0 52px;" ${ (i.personasConfirmadas||0) <= 1 ? 'disabled' : ''}>➖</button>
+             <span style="flex:1; text-align:center; font-weight:700; font-size:14px;">${i.personasConfirmadas || 0} de ${i.personasMax} confirmados</span>
+             <button class="btn-q-neutral" data-action="conf-plus" data-id="${i.id}" style="flex:0 0 52px;" ${ (i.personasConfirmadas||0) >= i.personasMax ? 'disabled' : ''}>➕</button>
+           </div>`
+        : '';
       const quickActions = estado === 'confirmado'
-        ? `<div class="quick-actions">
+        ? `${stepper}<div class="quick-actions">
              <button class="btn-q-neutral" data-action="quick-pending" data-id="${i.id}">↺ Volver a pendiente</button>
              <button class="btn-q-no" data-action="quick-decline" data-id="${i.id}">❌ No va</button>
            </div>`
@@ -1263,6 +1271,21 @@ ${url}
         }
         btn.dataset.armed = '';
         btn.classList.remove('armed');
+      }
+
+      if (action === 'conf-minus' || action === 'conf-plus') {
+        const cur = inv.personasConfirmadas || 0;
+        const n = action === 'conf-plus'
+          ? Math.min(inv.personasMax, cur + 1)
+          : Math.max(1, cur - 1);
+        if (n === cur) return;
+        btn.disabled = true;
+        try {
+          await update(ref(db, '/baby-shower-aj/invitados/' + id), { personasConfirmadas: n });
+        } catch (err) {
+          console.error(err);
+          showToast('Error: ' + err.message, 'error');
+        }
       }
 
       if (action === 'quick-pending') {
