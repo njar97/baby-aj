@@ -160,6 +160,32 @@
       transition: width .4s ease;
     }
 
+    /* ---- Chips de filtro rápido ---- */
+    .chips {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+    .chip-f {
+      font-family: 'Nunito', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: 2px solid var(--gris-claro);
+      background: var(--blanco);
+      color: var(--negro);
+      cursor: pointer;
+      transition: transform .06s;
+    }
+    .chip-f:active { transform: scale(0.96); }
+    .chip-f.active {
+      background: var(--rojo);
+      color: var(--blanco);
+      border-color: var(--rojo-osc);
+    }
+
     /* ---- Toolbar ---- */
     .toolbar {
       display: flex;
@@ -256,6 +282,10 @@
       background: #25D366;
       color: var(--blanco);
       border-color: var(--negro);
+      flex: 1 1 100%;
+      font-size: 14px;
+      padding: 12px;
+      border-radius: 12px;
     }
     .inv-actions .btn-wa:hover { background: #1FAE54; }
     .inv-actions .btn-wa.sent {
@@ -629,6 +659,8 @@
       <div class="progress-row" id="lado-stats" style="margin-top:8px; margin-bottom:0;"></div>
     </div>
 
+    <div class="chips" id="chips"></div>
+
     <div class="toolbar">
       <input type="search" id="search" placeholder="Buscar por nombre…" />
       <select id="filter">
@@ -725,6 +757,34 @@
       <div class="modal-actions">
         <button type="button" class="btn" id="import-cancel">Cancelar</button>
         <button type="button" class="btn btn-primary" id="import-save">Importar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== MODAL SEND (sin teléfono) ====== -->
+  <div class="modal-backdrop hidden" id="modal-send">
+    <div class="modal">
+      <h2 class="modal-title">📤 Enviar a <span id="send-name"></span></h2>
+      <p class="field-hint" style="margin-bottom:14px;">
+        No tiene teléfono guardado. Elegí cómo enviarle la invitación:
+      </p>
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <button type="button" class="btn" id="send-wa" style="background:#25D366; color:#fff; text-align:left;">
+          📱 WhatsApp — elegir contacto
+        </button>
+        <button type="button" class="btn" id="send-msgr" style="background:#0084FF; color:#fff; text-align:left;">
+          💬 Messenger — elegir contacto
+        </button>
+        <button type="button" class="btn" id="send-share" style="text-align:left;">
+          📤 Otra app (compartir…)
+        </button>
+        <button type="button" class="btn" id="send-copy" style="text-align:left;">
+          🔗 Copiar mensaje completo
+        </button>
+      </div>
+      <p class="field-hint" style="margin-top:12px;" id="send-hint"></p>
+      <div class="modal-actions">
+        <button type="button" class="btn" id="send-cancel" style="flex:1">Cancelar</button>
       </div>
     </div>
   </div>
@@ -1088,8 +1148,32 @@ ${url}
     // ---- Render ----
     function render() {
       renderStats();
+      renderChips();
       renderList();
     }
+
+    // ---- Chips de filtro rápido ----
+    const CHIP_DEFS = [
+      { value: 'not-sent',    label: (c) => `📤 Sin enviar (${c})`,   count: (l) => l.filter(i => !i.enviadoEn).length },
+      { value: 'pendiente',   label: (c) => `⏳ Sin responder (${c})`, count: (l) => l.filter(i => !i.estado || i.estado === 'pendiente').length },
+      { value: 'lado-imelda', label: (c) => `👥 Imelda (${c})`,        count: (l) => l.filter(i => i.lado === 'imelda').length },
+      { value: 'lado-mama',   label: (c) => `👥 Mamá (${c})`,          count: (l) => l.filter(i => i.lado === 'mama').length },
+      { value: 'all',         label: () => 'Todos',                    count: () => 0 },
+    ];
+    function renderChips() {
+      const list = Object.values(invitados);
+      const current = $('#filter').value;
+      $('#chips').innerHTML = CHIP_DEFS.map(c =>
+        `<button class="chip-f ${current === c.value ? 'active' : ''}" data-chip="${c.value}">${c.label(c.count(list))}</button>`
+      ).join('');
+    }
+    $('#chips').addEventListener('click', (e) => {
+      const chip = e.target.closest('button[data-chip]');
+      if (!chip) return;
+      $('#filter').value = chip.dataset.chip;
+      renderChips();
+      renderList();
+    });
 
     function renderStats() {
       const list = Object.values(invitados);
@@ -1183,7 +1267,7 @@ ${url}
       const ladoTxt = i.lado === 'imelda' ? '👥 Imelda' : i.lado === 'mama' ? '👥 Mamá' : '';
       const ladoSpan = ladoTxt ? `<span>· ${ladoTxt}</span>` : '';
 
-      const wa = i.enviadoEn ? '↻ Re-enviar' : '📱 WhatsApp';
+      const wa = i.enviadoEn ? '↻ Re-enviar invitación' : '📤 Enviar invitación';
       const waCls = i.enviadoEn ? 'btn-wa sent' : 'btn-wa';
 
       const undoBtn = i.enviadoEn
@@ -1305,16 +1389,16 @@ ${url}
       }
 
       if (action === 'wa') {
-        // Abrir WhatsApp PRIMERO (mismo tick del click, sin await previo)
-        // para no perder el user-gesture en Safari iOS / Chrome móvil.
-        // El marcado de enviadoEn corre en background.
-        const link = buildWaLink(inv);
-        window.open(link, '_blank', 'noopener');
-        update(ref(db, '/baby-shower-aj/invitados/' + id), { enviadoEn: Date.now() })
-          .catch(err => {
-            console.error(err);
-            showToast('No se pudo marcar como enviado', 'error');
-          });
+        if (normalizePhone(inv.telefono)) {
+          // Con teléfono: WhatsApp directo (mismo tick del click para no
+          // perder el user-gesture en móvil). Marcado corre en background.
+          const link = buildWaLink(inv);
+          window.open(link, '_blank', 'noopener');
+          marcarEnviado(id);
+        } else {
+          // Sin teléfono: modal con opciones de envío
+          openSendModal(id);
+        }
       }
 
       if (action === 'quick-confirm') {
@@ -1378,6 +1462,83 @@ ${url}
         pendingDeleteId = id;
         $('#delete-name').textContent = inv.nombre;
         $('#modal-delete').classList.remove('hidden');
+      }
+    });
+
+    // ---- Send modal (invitados sin teléfono) ----
+    let pendingSendId = null;
+
+    function marcarEnviado(id) {
+      update(ref(db, '/baby-shower-aj/invitados/' + id), { enviadoEn: Date.now() })
+        .catch(err => {
+          console.error(err);
+          showToast('No se pudo marcar como enviado', 'error');
+        });
+    }
+
+    function openSendModal(id) {
+      pendingSendId = id;
+      $('#send-name').textContent = invitados[id]?.nombre || '';
+      $('#send-hint').textContent = '';
+      // Compartir solo disponible si el navegador lo soporta
+      $('#send-share').style.display = navigator.share ? '' : 'none';
+      $('#modal-send').classList.remove('hidden');
+    }
+    function closeSendModal() {
+      $('#modal-send').classList.add('hidden');
+      pendingSendId = null;
+    }
+    $('#send-cancel').addEventListener('click', closeSendModal);
+    $('#modal-send').addEventListener('click', (e) => {
+      if (e.target === e.currentTarget) closeSendModal();
+    });
+
+    function getSendMsg() {
+      const inv = invitados[pendingSendId];
+      return buildWaMessage(inv.nombre, pendingSendId);
+    }
+
+    $('#send-wa').addEventListener('click', () => {
+      const id = pendingSendId;
+      // wa.me sin número: WhatsApp abre con el mensaje y pide elegir contacto
+      window.open(`https://wa.me/?text=${encodeURIComponent(getSendMsg())}`, '_blank', 'noopener');
+      marcarEnviado(id);
+      closeSendModal();
+    });
+
+    $('#send-msgr').addEventListener('click', async () => {
+      const id = pendingSendId;
+      const url = `${SITE_BASE}/?id=${id}`;
+      // Messenger solo comparte el link; copiamos el mensaje completo
+      // para que lo pueda pegar en el chat.
+      try { await navigator.clipboard.writeText(getSendMsg()); } catch {}
+      location.href = `fb-messenger://share?link=${encodeURIComponent(url)}`;
+      showToast('Mensaje copiado — pegalo en el chat de Messenger', 'success', 5000);
+      marcarEnviado(id);
+      closeSendModal();
+    });
+
+    $('#send-share').addEventListener('click', async () => {
+      const id = pendingSendId;
+      try {
+        await navigator.share({ text: getSendMsg() });
+        marcarEnviado(id);
+        closeSendModal();
+      } catch (err) {
+        // usuario canceló el share: no marcar como enviado
+        if (err && err.name !== 'AbortError') console.error(err);
+      }
+    });
+
+    $('#send-copy').addEventListener('click', async () => {
+      const id = pendingSendId;
+      try {
+        await navigator.clipboard.writeText(getSendMsg());
+        showToast('Mensaje copiado — pegalo donde quieras', 'success');
+        marcarEnviado(id);
+        closeSendModal();
+      } catch {
+        $('#send-hint').textContent = 'No se pudo copiar. Probá con otra opción.';
       }
     });
 
@@ -1568,7 +1729,7 @@ ${url}
 
     // ---- Search & filter ----
     $('#search').addEventListener('input', renderList);
-    $('#filter').addEventListener('change', renderList);
+    $('#filter').addEventListener('change', () => { renderChips(); renderList(); });
 
     // ====== SETTINGS ======
     function openSettings() {
@@ -1752,6 +1913,7 @@ ${url}
     document.addEventListener('keydown', (e) => {
       if (e.key !== 'Escape') return;
       if (!$('#modal-edit').classList.contains('hidden')) closeEditModal();
+      if (!$('#modal-send').classList.contains('hidden')) closeSendModal();
       if (!$('#modal-delete').classList.contains('hidden')) {
         $('#modal-delete').classList.add('hidden');
         pendingDeleteId = null;
