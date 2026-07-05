@@ -4,9 +4,9 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Baby Shower — Alexander Jared 🍼</title>
-  <meta name="description" content="Domingo 26 de julio · 2:00 pm · Col. Montevideo, Av. Salarrué, Block C, casa #7"/>
+  <meta name="description" content="Sábado 18 de julio · 2:30 pm · Col. Montevideo, Av. Salarrué, Block C, casa #7"/>
   <meta property="og:title"       content="Baby Shower — Alexander Jared 🍼"/>
-  <meta property="og:description" content="Domingo 26 de julio · 2:00 pm · Col. Montevideo, Av. Salarrué, Block C, casa #7"/>
+  <meta property="og:description" content="Sábado 18 de julio · 2:30 pm · Col. Montevideo, Av. Salarrué, Block C, casa #7"/>
   <meta property="og:url"         content="https://njar97.github.io/baby-aj/"/>
   <meta property="og:type"        content="website"/>
   <meta property="og:image"       content="https://njar97.github.io/baby-aj/preview-aj.jpg"/>
@@ -14,7 +14,7 @@
   <meta property="og:image:height" content="630"/>
   <meta name="twitter:card"        content="summary_large_image"/>
   <meta name="twitter:title"       content="Baby Shower — Alexander Jared 🍼"/>
-  <meta name="twitter:description" content="Domingo 26 de julio · 2:00 pm · Col. Montevideo, Av. Salarrué"/>
+  <meta name="twitter:description" content="Sábado 18 de julio · 2:30 pm · Col. Montevideo, Av. Salarrué"/>
   <meta name="color-scheme" content="light"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet"/>
@@ -445,8 +445,8 @@
   <div class="info-bloque reveal">
     <div class="fecha-badge">
       <div class="fb-lado izq">Julio<br/>2026</div>
-      <div class="fb-centro">26</div>
-      <div class="fb-lado der">Domingo<br/>2:00 pm</div>
+      <div class="fb-centro">18</div>
+      <div class="fb-lado der">Sábado<br/>2:30 pm</div>
     </div>
     <div class="divisor"><span style="font-size:16px;">⭐</span></div>
     <p class="info-lugar">
@@ -571,7 +571,7 @@
   };
 
   function actualizarContador() {
-    const evento = new Date('2026-07-26T14:00:00');
+    const evento = new Date('2026-07-18T14:30:00');
     const diff   = evento - new Date();
     if (diff <= 0) {
       ui.dias.textContent   = '🍼';
@@ -653,8 +653,8 @@
       const ics = [
         'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//baby-aj//ES',
         'BEGIN:VEVENT',
-        'DTSTART:20260726T140000',
-        'DTEND:20260726T170000',
+        'DTSTART:20260718T143000',
+        'DTEND:20260718T173000',
         `SUMMARY:${titulo}`,
         `LOCATION:${lugar}`,
         'BEGIN:VALARM', 'TRIGGER:-P1D', 'ACTION:DISPLAY', 'DESCRIPTION:Baby Shower mañana', 'END:VALARM',
@@ -670,7 +670,7 @@
       // Android/PC: Google Calendar (UTC: 14:00 SV = 20:00 UTC)
       const url = 'https://calendar.google.com/calendar/render?action=TEMPLATE'
         + '&text=' + encodeURIComponent(titulo)
-        + '&dates=20260726T200000Z/20260726T230000Z'
+        + '&dates=20260718T203000Z/20260718T233000Z'
         + '&location=' + encodeURIComponent(lugar);
       window.open(url, '_blank', 'noopener');
     }
@@ -815,13 +815,13 @@
       ui.thanksEmoji.textContent = '🎉';
       ui.thanksTitle.textContent = n === 1 ? '¡Te esperamos!' : '¡Los esperamos!';
       if (max > 1) {
-        ui.thanksText.textContent = `Hay ${n} de ${max} lugares confirmados de tu grupo. ¡Nos vemos el domingo 26 de julio!`;
+        ui.thanksText.textContent = `Hay ${n} de ${max} lugares confirmados de tu grupo. ¡Nos vemos el sábado 18 de julio!`;
         // otra persona del mismo grupo puede sumarse con el mismo link
         if (n < max) {
           extra.appendChild(mkBtn('btn-si', '➕ Yo también voy', () => guardar('confirmado', n + 1, true)));
         }
       } else {
-        ui.thanksText.textContent = 'Tu asistencia fue confirmada. ¡Nos vemos el domingo 26 de julio!';
+        ui.thanksText.textContent = 'Tu asistencia fue confirmada. ¡Nos vemos el sábado 18 de julio!';
       }
     } else {
       ui.thanksEmoji.textContent = '🧸';
