@@ -413,6 +413,51 @@
       0%, 100% { box-shadow: 0 6px 18px rgba(92,51,24,0.35); }
       50%      { box-shadow: 0 6px 26px rgba(139,94,60,0.65); }
     }
+    /* anillo de atención cuando la música está apagada */
+    .music-btn.attn::after {
+      content: '';
+      position: absolute;
+      inset: -6px;
+      border-radius: 50%;
+      border: 3px solid var(--dorado);
+      animation: anillo 1.6s ease-out infinite;
+    }
+    @keyframes anillo {
+      0%   { transform: scale(0.8); opacity: 1; }
+      100% { transform: scale(1.5); opacity: 0; }
+    }
+
+    /* globito que señala el botón de música */
+    .music-hint {
+      position: fixed;
+      right: 78px;
+      bottom: 26px;
+      background: var(--cafe-d);
+      color: #fff;
+      padding: 10px 14px;
+      border-radius: 14px;
+      font-size: 13px;
+      font-weight: 700;
+      font-family: 'Nunito', sans-serif;
+      z-index: 179;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+      animation: saltito 1.3s ease-in-out infinite;
+      white-space: nowrap;
+    }
+    .music-hint::after {
+      content: '';
+      position: absolute;
+      right: -7px;
+      top: 50%;
+      transform: translateY(-50%);
+      border-top: 7px solid transparent;
+      border-bottom: 7px solid transparent;
+      border-left: 8px solid var(--cafe-d);
+    }
+    @keyframes saltito {
+      0%, 100% { transform: translateX(0); }
+      50%      { transform: translateX(-7px); }
+    }
 
     .hidden { display: none !important; }
     .error-card { text-align: center; }
@@ -525,7 +570,8 @@
 </div>
 
 <audio id="bg-music" src="lullaby.mp3" loop preload="auto"></audio>
-<button class="music-btn" id="music-btn" aria-label="Música">🔇</button>
+<div class="music-hint" id="music-hint">🎵 Tocá para la música</div>
+<button class="music-btn attn" id="music-btn" aria-label="Música">🔇</button>
 
 <div class="toast hidden" id="toast" role="status" aria-live="polite"></div>
 <div class="confetti" id="confetti" aria-hidden="true"></div>
@@ -619,22 +665,44 @@
   (function() {
     const audio = $('#bg-music');
     const btn   = $('#music-btn');
+    const hint  = $('#music-hint');
     audio.volume = 0.35;
 
     function setUI(playing) {
       btn.textContent = playing ? '🎵' : '🔇';
       btn.classList.toggle('playing', playing);
+      btn.classList.toggle('attn', !playing);
+      hint.classList.toggle('hidden', playing || audio._userPaused);
     }
 
-    btn.addEventListener('click', () => {
-      if (audio.paused) audio.play().then(() => setUI(true)).catch(() => {});
-      else { audio.pause(); setUI(false); audio._userPaused = true; }
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (audio.paused || audio.muted) {
+        audio.muted = false;
+        audio._userPaused = false;
+        audio.play().then(() => setUI(true)).catch(() => {});
+      } else {
+        audio.pause();
+        audio._userPaused = true;
+        setUI(false);
+      }
     });
 
-    // arrancar en la primera interacción (los navegadores bloquean autoplay)
+    // Truco: el autoplay CON sonido está bloqueado, pero MUTEADO sí se permite.
+    // Arrancamos muteados de fondo, y al primer toque solo desmutear = suena
+    // al instante como si siempre hubiera estado sonando.
+    audio.muted = true;
+    audio.play().catch(() => { /* algunos navegadores bloquean incluso muteado */ });
+
     function tryStart() {
-      if (!audio.paused || audio._userPaused) return cleanup();
-      audio.play().then(() => { setUI(true); cleanup(); }).catch(() => {});
+      if (audio._userPaused) return cleanup();
+      audio.muted = false;
+      if (audio.paused) {
+        audio.play().then(() => { setUI(true); cleanup(); }).catch(() => {});
+      } else {
+        setUI(true);
+        cleanup();
+      }
     }
     function cleanup() {
       ['pointerdown','touchstart','keydown','scroll'].forEach(ev =>
@@ -642,8 +710,11 @@
     }
     ['pointerdown','touchstart','keydown','scroll'].forEach(ev =>
       document.addEventListener(ev, tryStart, { passive: true }));
-    // intento directo por si el navegador lo permite
-    audio.play().then(() => { setUI(true); cleanup(); }).catch(() => {});
+
+    // por si el navegador permite sonido directo (usuario frecuente del sitio)
+    setTimeout(() => {
+      if (!audio.paused && !audio.muted) setUI(true);
+    }, 600);
   })();
 
   // ── Agregar al calendario ──
