@@ -627,6 +627,7 @@
         <option value="no-phone">Sin teléfono</option>
       </select>
       <button class="btn btn-primary" id="btn-add">+ Agregar</button>
+      <button class="btn btn-yellow" id="btn-import">📥 Importar</button>
     </div>
 
     <div id="invitados-list">
@@ -666,6 +667,34 @@
           <button type="submit" class="btn btn-primary" id="edit-save">Guardar</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- ====== MODAL IMPORT ====== -->
+  <div class="modal-backdrop hidden" id="modal-import">
+    <div class="modal" style="max-width: 480px;">
+      <h2 class="modal-title">📥 Importar lista</h2>
+      <p class="field-hint" style="margin-bottom:10px;">
+        Pegá un invitado por línea. Formatos aceptados:<br/>
+        <strong>Nombre</strong> · <strong>Nombre 2</strong> (número al final = personas) · <strong>Nombre, 7777-8888, 2</strong>
+      </p>
+      <div class="field">
+        <textarea id="import-text" rows="12" style="font-family:'Nunito',sans-serif; font-size:14px; padding:10px 12px; border:2px solid var(--negro); border-radius:10px; resize:vertical;" placeholder="Silvia Flores&#10;Griselda 2&#10;Margaret 3"></textarea>
+      </div>
+      <div class="field">
+        <label for="import-genero">Género por defecto</label>
+        <select id="import-genero">
+          <option value="femenino" selected>Femenino</option>
+          <option value="masculino">Masculino</option>
+          <option value="plural">Plural / Familia</option>
+        </select>
+        <span class="field-hint">Se aplica a todos. Después podés editar casos puntuales.</span>
+      </div>
+      <p class="form-error" id="import-error"></p>
+      <div class="modal-actions">
+        <button type="button" class="btn" id="import-cancel">Cancelar</button>
+        <button type="button" class="btn btn-primary" id="import-save">Importar</button>
+      </div>
     </div>
   </div>
 
@@ -1314,6 +1343,86 @@ ${url}
       } finally {
         btn.disabled = false;
       }
+    });
+
+    // ---- Import modal ----
+    $('#btn-import').addEventListener('click', () => {
+      $('#import-text').value = '';
+      $('#import-error').textContent = '';
+      $('#modal-import').classList.remove('hidden');
+      setTimeout(() => $('#import-text').focus(), 50);
+    });
+    $('#import-cancel').addEventListener('click', () => $('#modal-import').classList.add('hidden'));
+    $('#modal-import').addEventListener('click', (e) => {
+      if (e.target === e.currentTarget) $('#modal-import').classList.add('hidden');
+    });
+
+    function parseImportLine(line) {
+      line = line.trim();
+      if (!line) return null;
+      let nombre = line, telefono = '', personasMax = 1;
+      if (line.includes(',')) {
+        const parts = line.split(',').map(p => p.trim()).filter(Boolean);
+        nombre = parts[0];
+        for (const p of parts.slice(1)) {
+          const digits = p.replace(/[^\d]/g, '');
+          if (digits.length >= 7) telefono = p;
+          else if (/^\d{1,2}$/.test(p)) personasMax = Number(p);
+        }
+      } else {
+        // "Nombre 2" → número suelto al final = personas
+        const m = line.match(/^(.*?)[\s.·]+(\d{1,2})$/);
+        if (m && Number(m[2]) <= 20) { nombre = m[1].trim(); personasMax = Number(m[2]); }
+      }
+      // Capitalizar cada palabra
+      nombre = nombre.replace(/\S+/g, w => w.charAt(0).toUpperCase() + w.slice(1));
+      if (!nombre) return null;
+      return { nombre, telefono, personasMax: Math.max(1, personasMax) };
+    }
+
+    $('#import-save').addEventListener('click', async () => {
+      const errEl = $('#import-error');
+      errEl.textContent = '';
+      const genero = $('#import-genero').value;
+      const lines = $('#import-text').value.split('\n');
+      const parsed = lines.map(parseImportLine).filter(Boolean);
+      if (!parsed.length) { errEl.textContent = 'No hay líneas válidas.'; return; }
+
+      // detectar duplicados contra los existentes (por nombre, sin mayúsculas)
+      const existentes = new Set(Object.values(invitados).map(i => (i.nombre || '').trim().toLowerCase()));
+      const nuevos = parsed.filter(p => !existentes.has(p.nombre.toLowerCase()));
+      const dupes  = parsed.length - nuevos.length;
+      if (!nuevos.length) { errEl.textContent = 'Todos ya existen en la lista.'; return; }
+
+      const btn = $('#import-save');
+      btn.disabled = true;
+      let ok = 0, fail = 0;
+      for (const p of nuevos) {
+        let newId = genId();
+        while (invitados[newId]) newId = genId();
+        try {
+          await set(ref(db, '/baby-shower-aj/invitados/' + newId), {
+            nombre: p.nombre,
+            telefono: p.telefono,
+            personasMax: p.personasMax,
+            genero,
+            estado: 'pendiente',
+            personasConfirmadas: 0,
+            creadoEn: Date.now()
+          });
+          invitados[newId] = { nombre: p.nombre };
+          ok++;
+        } catch (err) {
+          console.error('import fail', p.nombre, err);
+          fail++;
+        }
+      }
+      btn.disabled = false;
+      $('#modal-import').classList.add('hidden');
+      let msg = `✅ ${ok} invitados importados`;
+      if (dupes) msg += ` · ${dupes} ya existían`;
+      if (fail)  msg += ` · ${fail} fallaron`;
+      showToast(msg, fail ? 'error' : 'success', 5000);
     });
 
     // ---- Delete modal ----
