@@ -671,6 +671,7 @@
         <option value="confirmado">Confirmados</option>
         <option value="declinado">No asistirán</option>
         <option value="not-sent">No enviados</option>
+        <option value="to-remind">🔔 Por recordar</option>
         <option value="sent">Enviados</option>
         <option value="no-phone">Sin teléfono</option>
       </select>
@@ -960,9 +961,25 @@ ${url}
 ¡Te esperamos! ⭐`;
     }
 
-    function buildWaLink(inv) {
+    function buildWaReminder(nombre, id) {
+      const url = `${SITE_BASE}/?id=${id}`;
+      return `¡Hola ${nombre}! 🍼
+
+Solo para recordarte el Baby Shower de Alexander Jared 🧸
+
+📅 Sábado 18 de julio · 2:30 pm
+
+¿Nos confirmás si podés venir? Es solo un toque aquí 👇
+${url}
+
+¡Nos encantaría contar con vos! ⭐`;
+    }
+
+    function buildWaLink(inv, kind = 'invite') {
       const phone = normalizePhone(inv.telefono);
-      const msg = buildWaMessage(inv.nombre, inv.id);
+      const msg = kind === 'reminder'
+        ? buildWaReminder(inv.nombre, inv.id)
+        : buildWaMessage(inv.nombre, inv.id);
       const base = phone ? `https://wa.me/${phone}` : `https://wa.me/`;
       return `${base}?text=${encodeURIComponent(msg)}`;
     }
@@ -1155,6 +1172,7 @@ ${url}
     // ---- Chips de filtro rápido ----
     const CHIP_DEFS = [
       { value: 'not-sent',    label: (c) => `📤 Sin enviar (${c})`,   count: (l) => l.filter(i => !i.enviadoEn).length },
+      { value: 'to-remind',   label: (c) => `🔔 Por recordar (${c})`, count: (l) => l.filter(i => i.enviadoEn && (!i.estado || i.estado === 'pendiente')).length },
       { value: 'pendiente',   label: (c) => `⏳ Sin responder (${c})`, count: (l) => l.filter(i => !i.estado || i.estado === 'pendiente').length },
       { value: 'lado-imelda', label: (c) => `👥 Imelda (${c})`,        count: (l) => l.filter(i => i.lado === 'imelda').length },
       { value: 'lado-mama',   label: (c) => `👥 Mamá (${c})`,          count: (l) => l.filter(i => i.lado === 'mama').length },
@@ -1222,6 +1240,7 @@ ${url}
           if (filter === 'confirmado' && i.estado !== 'confirmado') return false;
           if (filter === 'declinado'  && i.estado !== 'declinado') return false;
           if (filter === 'not-sent'   && i.enviadoEn) return false;
+          if (filter === 'to-remind'  && !(i.enviadoEn && (!i.estado || i.estado === 'pendiente'))) return false;
           if (filter === 'sent'       && !i.enviadoEn) return false;
           if (filter === 'no-phone'   && i.telefono && String(i.telefono).trim().length > 0) return false;
           if (search && !(i.nombre || '').toLowerCase().includes(search)) return false;
@@ -1298,6 +1317,10 @@ ${url}
              <button class="btn-q-no"  data-action="quick-decline" data-id="${i.id}">❌ No va</button>
            </div>`;
 
+      const remindBtn = (i.enviadoEn && estado === 'pendiente')
+        ? `<button data-action="remind" data-id="${i.id}" style="background:#FFF3CD; border-color:#B8860B; color:#7A5500;">🔔 Recordar</button>`
+        : '';
+
       return `
         <div class="invitado-card estado-${estado}">
           <div class="inv-top">
@@ -1318,6 +1341,7 @@ ${url}
           ${quickActions}
           <div class="inv-actions">
             <button class="${waCls}" data-action="wa" data-id="${i.id}">${wa}</button>
+            ${remindBtn}
             ${undoBtn}
             <button data-action="copy" data-id="${i.id}">🔗 Copiar link</button>
             <button data-action="edit" data-id="${i.id}">✏️ Editar</button>
@@ -1385,6 +1409,15 @@ ${url}
           console.error(err);
           showToast('Error: ' + err.message, 'error');
           btn.disabled = false;
+        }
+      }
+
+      if (action === 'remind') {
+        if (normalizePhone(inv.telefono)) {
+          window.open(buildWaLink(inv, 'reminder'), '_blank', 'noopener');
+          marcarEnviado(id);
+        } else {
+          openSendModal(id, 'reminder');
         }
       }
 
@@ -1476,8 +1509,11 @@ ${url}
         });
     }
 
-    function openSendModal(id) {
+    let pendingSendKind = 'invite';
+
+    function openSendModal(id, kind = 'invite') {
       pendingSendId = id;
+      pendingSendKind = kind;
       $('#send-name').textContent = invitados[id]?.nombre || '';
       $('#send-hint').textContent = '';
       // Compartir solo disponible si el navegador lo soporta
@@ -1495,7 +1531,9 @@ ${url}
 
     function getSendMsg() {
       const inv = invitados[pendingSendId];
-      return buildWaMessage(inv.nombre, pendingSendId);
+      return pendingSendKind === 'reminder'
+        ? buildWaReminder(inv.nombre, pendingSendId)
+        : buildWaMessage(inv.nombre, pendingSendId);
     }
 
     $('#send-wa').addEventListener('click', () => {
