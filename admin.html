@@ -619,6 +619,8 @@
       <input type="search" id="search" placeholder="Buscar por nombre…" />
       <select id="filter">
         <option value="all">Todos</option>
+        <option value="lado-imelda">👥 De Imelda</option>
+        <option value="lado-mama">👥 De la mamá</option>
         <option value="pendiente">Pendientes</option>
         <option value="confirmado">Confirmados</option>
         <option value="declinado">No asistirán</option>
@@ -661,6 +663,13 @@
             <option value="plural">Plural / Familia</option>
           </select>
         </div>
+        <div class="field">
+          <label for="edit-lado">De parte de (solo interno, no se ve en la invitación)</label>
+          <select id="edit-lado">
+            <option value="imelda">Imelda</option>
+            <option value="mama">La mamá</option>
+          </select>
+        </div>
         <p class="form-error" id="edit-error"></p>
         <div class="modal-actions">
           <button type="button" class="btn" id="edit-cancel">Cancelar</button>
@@ -689,6 +698,14 @@
           <option value="plural">Plural / Familia</option>
         </select>
         <span class="field-hint">Se aplica a todos. Después podés editar casos puntuales.</span>
+      </div>
+      <div class="field">
+        <label for="import-lado">De parte de</label>
+        <select id="import-lado">
+          <option value="imelda">Imelda</option>
+          <option value="mama">La mamá</option>
+        </select>
+        <span class="field-hint">Solo interno para filtrar — no aparece en la invitación.</span>
       </div>
       <p class="form-error" id="import-error"></p>
       <div class="modal-actions">
@@ -1092,6 +1109,8 @@ ${url}
       const list = Object.entries(invitados)
         .map(([id, data]) => ({ ...data, id }))
         .filter(i => {
+          if (filter === 'lado-imelda' && i.lado !== 'imelda') return false;
+          if (filter === 'lado-mama'   && i.lado !== 'mama') return false;
           if (filter === 'pendiente'  && i.estado && i.estado !== 'pendiente') return false;
           if (filter === 'confirmado' && i.estado !== 'confirmado') return false;
           if (filter === 'declinado'  && i.estado !== 'declinado') return false;
@@ -1138,6 +1157,9 @@ ${url}
         ? escapeHtml(i.telefono)
         : '<em style="color:#bbb">sin teléfono</em>';
 
+      const ladoTxt = i.lado === 'imelda' ? '👥 Imelda' : i.lado === 'mama' ? '👥 Mamá' : '';
+      const ladoSpan = ladoTxt ? `<span>· ${ladoTxt}</span>` : '';
+
       const wa = i.enviadoEn ? '↻ Re-enviar' : '📱 WhatsApp';
       const waCls = i.enviadoEn ? 'btn-wa sent' : 'btn-wa';
 
@@ -1167,6 +1189,7 @@ ${url}
               <div class="inv-meta">
                 <span>${tel}</span>
                 <span>· ${i.personasMax} ${i.personasMax === 1 ? 'persona' : 'personas'}</span>
+                ${ladoSpan}
                 ${respondidoTxt}
               </div>
             </div>
@@ -1281,7 +1304,8 @@ ${url}
       $('#edit-nombre').value      = inv?.nombre || '';
       $('#edit-telefono').value    = inv?.telefono || '';
       $('#edit-personasMax').value = inv?.personasMax || 1;
-      $('#edit-genero').value      = inv?.genero || 'masculino';
+      $('#edit-genero').value      = inv?.genero || 'femenino';
+      $('#edit-lado').value        = inv?.lado || 'imelda';
       $('#edit-error').textContent = '';
       $('#modal-edit').classList.remove('hidden');
       setTimeout(() => $('#edit-nombre').focus(), 50);
@@ -1304,6 +1328,7 @@ ${url}
       const telefono = $('#edit-telefono').value.trim();
       const personasMax = Number($('#edit-personasMax').value);
       const genero   = $('#edit-genero').value;
+      const lado     = $('#edit-lado').value;
 
       if (!nombre) {
         $('#edit-error').textContent = 'El nombre es requerido.';
@@ -1319,7 +1344,7 @@ ${url}
       try {
         if (editingId) {
           await update(ref(db, '/baby-shower-aj/invitados/' + editingId), {
-            nombre, telefono, personasMax, genero
+            nombre, telefono, personasMax, genero, lado
           });
           showToast('Invitado actualizado', 'success');
         } else {
@@ -1330,6 +1355,7 @@ ${url}
             telefono,
             personasMax,
             genero,
+            lado,
             estado: 'pendiente',
             personasConfirmadas: 0,
             creadoEn: Date.now()
@@ -1384,6 +1410,7 @@ ${url}
       const errEl = $('#import-error');
       errEl.textContent = '';
       const genero = $('#import-genero').value;
+      const lado   = $('#import-lado').value;
       const lines = $('#import-text').value.split('\n');
       const parsed = lines.map(parseImportLine).filter(Boolean);
       if (!parsed.length) { errEl.textContent = 'No hay líneas válidas.'; return; }
@@ -1406,6 +1433,7 @@ ${url}
             telefono: p.telefono,
             personasMax: p.personasMax,
             genero,
+            lado,
             estado: 'pendiente',
             personasConfirmadas: 0,
             creadoEn: Date.now()
