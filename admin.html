@@ -950,31 +950,32 @@
 
     function buildWaMessage(nombre, id) {
       const url = `${SITE_BASE}/?id=${id}`;
-      return `¡Hola ${nombre}! 🍼
-
-Estamos celebrando la llegada de Alexander Jared con un Baby Shower y queremos que nos acompañes 🧸
-
-📅 Sábado 18 de julio · 2:30 pm
-📍 Col. Montevideo, Av. Salarrué, Block C, casa #7
-
-👇 Tocá este link para confirmar tu lugar (¡solo toma un segundo!):
-${url}
-
-¡Te esperamos! ⭐`;
+      const NL = String.fromCharCode(10);
+      return [
+        `¡Hola ${nombre}! 🍼✨`,
+        '',
+        'Tenés una invitación especial *a tu nombre* para el Baby Shower de Alexander Jared 🧸',
+        '',
+        '👇 Abrila aquí (con música y sorpresa 🎵):',
+        url,
+        '',
+        'Ahí mismo confirmás tu lugar con un solo toque 💛'
+      ].join(NL);
     }
 
     function buildWaReminder(nombre, id) {
       const url = `${SITE_BASE}/?id=${id}`;
-      return `¡Hola ${nombre}! 🍼
-
-Solo para recordarte el Baby Shower de Alexander Jared 🧸
-
-📅 Sábado 18 de julio · 2:30 pm
-
-¿Nos confirmás si podés venir? Es solo un toque aquí 👇
-${url}
-
-¡Nos encantaría contar con vos! ⭐`;
+      const NL = String.fromCharCode(10);
+      return [
+        `¡Hola ${nombre}! 🧸`,
+        '',
+        '¿Ya viste tu invitación? Está a tu nombre 👇',
+        url,
+        '',
+        'Es solo un toque para apartar tu lugar — necesitamos saber cuántos somos para los recuerditos ⭐',
+        '',
+        '📅 Sábado 18 de julio · 2:30 pm'
+      ].join(NL);
     }
 
     function buildWaLink(inv, kind = 'invite') {
