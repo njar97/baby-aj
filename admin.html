@@ -677,6 +677,8 @@
       </select>
       <button class="btn btn-primary" id="btn-add">+ Agregar</button>
       <button class="btn btn-yellow" id="btn-import">📥 Importar</button>
+      <button class="btn" id="btn-resumen">📋 Resumen</button>
+      <button class="btn" id="btn-csv">⬇️ Excel</button>
     </div>
 
     <div id="invitados-list">
@@ -984,6 +986,10 @@ ${url}
       return `${base}?text=${encodeURIComponent(msg)}`;
     }
 
+    function normalizar(str) {
+      return String(str || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+    }
+
     function escapeHtml(s) {
       return String(s ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
     }
@@ -1243,7 +1249,7 @@ ${url}
           if (filter === 'to-remind'  && !(i.enviadoEn && (!i.estado || i.estado === 'pendiente'))) return false;
           if (filter === 'sent'       && !i.enviadoEn) return false;
           if (filter === 'no-phone'   && i.telefono && String(i.telefono).trim().length > 0) return false;
-          if (search && !(i.nombre || '').toLowerCase().includes(search)) return false;
+          if (search && !normalizar(i.nombre).includes(normalizar(search))) return false;
           return true;
         })
         .sort((a, b) => {
@@ -1496,6 +1502,89 @@ ${url}
         $('#delete-name').textContent = inv.nombre;
         $('#modal-delete').classList.remove('hidden');
       }
+    });
+
+    // ---- Resumen para compartir ----
+    $('#btn-resumen').addEventListener('click', async () => {
+      const list = Object.values(invitados);
+      const conf = list.filter(i => i.estado === 'confirmado');
+      const dec  = list.filter(i => i.estado === 'declinado');
+      const pend = list.filter(i => !i.estado || i.estado === 'pendiente');
+      const pers = conf.reduce((s2, i) => s2 + (i.personasConfirmadas || 0), 0);
+
+      const porLado = (lado) => {
+        const g = list.filter(i => i.lado === lado);
+        const c = g.filter(i => i.estado === 'confirmado');
+        const p = c.reduce((s2, i) => s2 + (i.personasConfirmadas || 0), 0);
+        return `${c.length}/${g.length} grupos · ${p} personas`;
+      };
+
+      const confTxt = conf
+        .sort((a, b) => (a.nombre || '').localeCompare(b.nombre || ''))
+        .map(i => `  ✅ ${i.nombre}${i.personasConfirmadas > 1 ? ` (${i.personasConfirmadas})` : ''}`)
+        .join('
+');
+      const pendTxt = pend
+        .sort((a, b) => (a.nombre || '').localeCompare(b.nombre || ''))
+        .map(i => `  ⏳ ${i.nombre}`)
+        .join('
+');
+
+      const txt = `🍼 Baby Shower Alexander Jared — Resumen
+`
+        + `📅 Sábado 18 de julio · 2:30 pm
+
+`
+        + `✅ Confirmados: ${conf.length} grupos · ${pers} personas
+`
+        + `❌ No asistirán: ${dec.length}
+`
+        + `⏳ Sin responder: ${pend.length}
+
+`
+        + `👥 Imelda: ${porLado('imelda')}
+`
+        + `👥 Mamá: ${porLado('mama')}
+
+`
+        + `CONFIRMADOS:
+${confTxt || '  (nadie aún)'}
+
+`
+        + `SIN RESPONDER:
+${pendTxt || '  (ninguno)'}`;
+
+      try {
+        await navigator.clipboard.writeText(txt);
+        showToast('📋 Resumen copiado — pegalo en WhatsApp', 'success');
+      } catch {
+        showToast('No se pudo copiar', 'error');
+      }
+    });
+
+    // ---- Exportar CSV (Excel) ----
+    $('#btn-csv').addEventListener('click', () => {
+      const rows = [['Nombre','Telefono','Personas','Confirmadas','Estado','De parte de','Enviado','Respondio']];
+      Object.values(invitados)
+        .sort((a, b) => (a.nombre || '').localeCompare(b.nombre || ''))
+        .forEach(i => {
+          rows.push([
+            i.nombre || '', i.telefono || '', i.personasMax || '',
+            i.personasConfirmadas ?? '', i.estado || 'pendiente',
+            i.lado === 'mama' ? 'Mamá' : 'Imelda',
+            i.enviadoEn ? new Date(i.enviadoEn).toLocaleDateString() : '',
+            i.respondidoEn ? new Date(i.respondidoEn).toLocaleDateString() : ''
+          ]);
+        });
+      const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(';')).join('
+');
+      const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'invitados-baby-shower.csv';
+      a.click();
+      URL.revokeObjectURL(a.href);
+      showToast('⬇️ Lista exportada', 'success');
     });
 
     // ---- Send modal (invitados sin teléfono) ----
