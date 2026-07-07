@@ -390,6 +390,28 @@
     }
     .btn-cal:active { transform: scale(0.97); }
 
+    /* ── Barra fija de confirmar ── */
+    .cta-bar {
+      position: fixed;
+      left: 0; right: 0; bottom: 0;
+      padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+      background: linear-gradient(180deg, rgba(251,245,238,0) 0%, rgba(251,245,238,0.95) 30%, var(--crema) 100%);
+      z-index: 170;
+      display: flex;
+      justify-content: center;
+    }
+    .cta-bar button {
+      max-width: 380px;
+      animation: latido 2.2s ease-in-out infinite;
+    }
+    @keyframes latido {
+      0%, 100% { transform: scale(1); }
+      50%      { transform: scale(1.03); }
+    }
+    /* subir el boton de musica cuando la barra esta visible */
+    .music-btn.raised { bottom: 88px; }
+    .music-hint.raised { bottom: 98px; }
+
     /* ── Botón de música flotante ── */
     .music-btn {
       position: fixed;
@@ -511,16 +533,7 @@
     <p id="hero-subtitle" class="invitee-sub"></p>
   </div>
 
-  <!-- COUNTDOWN -->
-  <div class="card reveal">
-    <div class="countdown-wrap">
-      <p class="faltan-label">✦ Faltan ✦</p>
-      <p class="countdown-num" id="dias">—</p>
-      <p class="countdown-sub" id="countdown-sub">días para celebrar</p>
-    </div>
-  </div>
-
-  <!-- RSVP -->
+  <!-- RSVP (antes del countdown para que quede a la vista) -->
   <section class="card hidden" id="rsvp-section">
     <p class="rsvp-pregunta" id="rsvp-pregunta">¿Nos acompañarás? 🍼</p>
     <p class="rsvp-sub" id="rsvp-sub">Confírmanos tu asistencia</p>
@@ -558,6 +571,15 @@
     <p class="error-text" id="error-text">Esta invitación no es válida.</p>
   </section>
 
+  <!-- COUNTDOWN -->
+  <div class="card reveal">
+    <div class="countdown-wrap">
+      <p class="faltan-label">✦ Faltan ✦</p>
+      <p class="countdown-num" id="dias">—</p>
+      <p class="countdown-sub" id="countdown-sub">días para celebrar</p>
+    </div>
+  </div>
+
   <!-- CIERRE -->
   <div class="cierre">
     <div class="cierre-ico">⭐ 🍼 ⭐</div>
@@ -572,6 +594,10 @@
 <audio id="bg-music" src="lullaby.mp3" loop preload="auto"></audio>
 <div class="music-hint" id="music-hint">🎵 Tocá para la música</div>
 <button class="music-btn attn" id="music-btn" aria-label="Música">🔇</button>
+
+<div class="cta-bar hidden" id="cta-bar">
+  <button class="btn btn-si" id="cta-btn">💛 Confirmar mi asistencia</button>
+</div>
 
 <div class="toast hidden" id="toast" role="status" aria-live="polite"></div>
 <div class="confetti" id="confetti" aria-hidden="true"></div>
@@ -808,6 +834,10 @@
     const max      = invitado.personasMax;
     const isPlural = max > 1 || invitado.genero === 'plural';
 
+    // barra fija de confirmar
+    document.querySelector('#cta-btn').textContent = isPlural ? '💛 Confirmar nuestra asistencia' : '💛 Confirmar mi asistencia';
+    setCtaVisible(true);
+
     ui.cuposBanner.classList.remove('hidden');
     ui.cuposText.textContent = max === 1 ? '1 lugar reservado para vos' : `${max} lugares reservados para ustedes`;
     ui.rsvpPregunta.textContent = isPlural ? '¿Nos acompañarán? 🍼' : '¿Nos acompañarás? 🍼';
@@ -869,7 +899,28 @@
     }
   }
 
+  // ── Barra fija de confirmar ──
+  const ctaBar = document.querySelector('#cta-bar');
+  let ctaActiva = false;
+  function setCtaVisible(on) {
+    ctaActiva = on;
+    ctaBar.classList.toggle('hidden', !on);
+    document.querySelector('#music-btn').classList.toggle('raised', on);
+    document.querySelector('#music-hint').classList.toggle('raised', on);
+  }
+  document.querySelector('#cta-btn').addEventListener('click', () => {
+    ui.rsvpSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  });
+  // ocultar la barra mientras los botones de votar ya están a la vista
+  new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (!ctaActiva) return;
+      ctaBar.classList.toggle('hidden', e.isIntersecting);
+    });
+  }, { threshold: 0.35 }).observe(ui.rsvpSection);
+
   function renderThanks() {
+    setCtaVisible(false);
     ui.rsvpSection.classList.add('hidden');
     ui.thanksCard.classList.remove('hidden');
     const max   = invitado.personasMax;
