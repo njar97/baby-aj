@@ -665,15 +665,20 @@
       <input type="search" id="search" placeholder="Buscar por nombre…" />
       <select id="filter">
         <option value="all">Todos</option>
+        <option value="confirmado">✅ Confirmados</option>
+        <option value="declinado">❌ No asistirán</option>
+        <option value="pendiente">⏳ Sin responder</option>
+        <option value="to-remind">🔔 Por recordar</option>
+        <option value="not-sent">📤 Sin enviar</option>
+        <option value="sent">Enviados</option>
         <option value="lado-imelda">👥 De Imelda</option>
         <option value="lado-mama">👥 De la mamá</option>
-        <option value="pendiente">Pendientes</option>
-        <option value="confirmado">Confirmados</option>
-        <option value="declinado">No asistirán</option>
-        <option value="not-sent">No enviados</option>
-        <option value="to-remind">🔔 Por recordar</option>
-        <option value="sent">Enviados</option>
         <option value="no-phone">Sin teléfono</option>
+      </select>
+      <select id="sort" title="Ordenar">
+        <option value="respondido">📅 Últimos en responder</option>
+        <option value="gestion">📋 Gestión (pendientes primero)</option>
+        <option value="nombre">🔤 Nombre (A-Z)</option>
       </select>
       <button class="btn btn-primary" id="btn-add">+ Agregar</button>
       <button class="btn btn-yellow" id="btn-import">📥 Importar</button>
@@ -1178,9 +1183,11 @@
 
     // ---- Chips de filtro rápido ----
     const CHIP_DEFS = [
-      { value: 'not-sent',    label: (c) => `📤 Sin enviar (${c})`,   count: (l) => l.filter(i => !i.enviadoEn).length },
-      { value: 'to-remind',   label: (c) => `🔔 Por recordar (${c})`, count: (l) => l.filter(i => i.enviadoEn && (!i.estado || i.estado === 'pendiente')).length },
+      { value: 'confirmado',  label: (c) => `✅ Confirmados (${c})`,   count: (l) => l.filter(i => i.estado === 'confirmado').length },
+      { value: 'declinado',   label: (c) => `❌ No asistirán (${c})`,  count: (l) => l.filter(i => i.estado === 'declinado').length },
       { value: 'pendiente',   label: (c) => `⏳ Sin responder (${c})`, count: (l) => l.filter(i => !i.estado || i.estado === 'pendiente').length },
+      { value: 'to-remind',   label: (c) => `🔔 Por recordar (${c})`, count: (l) => l.filter(i => i.enviadoEn && (!i.estado || i.estado === 'pendiente')).length },
+      { value: 'not-sent',    label: (c) => `📤 Sin enviar (${c})`,   count: (l) => l.filter(i => !i.enviadoEn).length },
       { value: 'lado-imelda', label: (c) => `👥 Imelda (${c})`,        count: (l) => l.filter(i => i.lado === 'imelda').length },
       { value: 'lado-mama',   label: (c) => `👥 Mamá (${c})`,          count: (l) => l.filter(i => i.lado === 'mama').length },
       { value: 'all',         label: () => 'Todos',                    count: () => 0 },
@@ -1254,11 +1261,28 @@
           return true;
         })
         .sort((a, b) => {
-          // Pendientes y no enviados primero, luego alfabético
-          const aRank = (a.enviadoEn ? 1 : 0) + (a.estado === 'pendiente' || !a.estado ? 0 : 2);
-          const bRank = (b.enviadoEn ? 1 : 0) + (b.estado === 'pendiente' || !b.estado ? 0 : 2);
-          if (aRank !== bRank) return aRank - bRank;
-          return (a.nombre || '').localeCompare(b.nombre || '');
+          const sort = $('#sort').value;
+          const nombreCmp = (a.nombre || '').localeCompare(b.nombre || '');
+
+          if (sort === 'nombre') return nombreCmp;
+
+          if (sort === 'gestion') {
+            // Pendientes y no enviados primero, luego alfabético
+            const aRank = (a.enviadoEn ? 1 : 0) + (a.estado === 'pendiente' || !a.estado ? 0 : 2);
+            const bRank = (b.enviadoEn ? 1 : 0) + (b.estado === 'pendiente' || !b.estado ? 0 : 2);
+            if (aRank !== bRank) return aRank - bRank;
+            return nombreCmp;
+          }
+
+          // 'respondido' (por defecto): los últimos en contestar arriba.
+          // Quienes ya respondieron van primero, ordenados por fecha de respuesta desc.
+          // Los que no han respondido quedan al final, alfabéticos.
+          const aResp = a.respondidoEn || 0;
+          const bResp = b.respondidoEn || 0;
+          if (aResp && bResp) return bResp - aResp;
+          if (aResp) return -1;
+          if (bResp) return 1;
+          return nombreCmp;
         });
 
       const container = $('#invitados-list');
@@ -1851,6 +1875,7 @@
     // ---- Search & filter ----
     $('#search').addEventListener('input', renderList);
     $('#filter').addEventListener('change', () => { renderChips(); renderList(); });
+    $('#sort').addEventListener('change', renderList);
 
     // ====== SETTINGS ======
     function openSettings() {
