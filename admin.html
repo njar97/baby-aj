@@ -186,17 +186,15 @@
       border-color: var(--rojo-osc);
     }
 
-    /* ---- Toolbar ---- */
+    /* ---- Toolbar (agrupada: buscar · filtros · acciones) ---- */
     .toolbar {
       display: flex;
-      gap: 8px;
-      margin-bottom: 12px;
-      flex-wrap: wrap;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 14px;
     }
     .toolbar input,
     .toolbar select {
-      flex: 1;
-      min-width: 0;
       font-family: 'Nunito', sans-serif;
       font-size: 14px;
       padding: 10px 12px;
@@ -205,9 +203,38 @@
       background: var(--blanco);
       color: var(--negro);
     }
-    .toolbar select { flex: 0 1 auto; }
     .toolbar input:focus,
     .toolbar select:focus { outline: none; border-color: var(--rojo); }
+
+    .tb-search { width: 100%; }
+
+    .tb-selects { display: flex; gap: 8px; }
+    .sel-field {
+      flex: 1 1 0;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .sel-cap {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--gris);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding-left: 3px;
+    }
+    .sel-field select { width: 100%; }
+
+    .tb-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      padding-top: 4px;
+      border-top: 1px solid rgba(0,0,0,0.07);
+    }
+    .tb-actions .btn { flex: 1 1 auto; }
+
     .invitado-card .respondio { font-weight: 700; color: var(--rojo-osc); }
 
     /* ---- Card de invitado (acordeón compacto) ---- */
@@ -708,28 +735,38 @@
     <div class="chips" id="chips"></div>
 
     <div class="toolbar">
-      <input type="search" id="search" placeholder="Buscar por nombre…" />
-      <select id="filter">
-        <option value="all">Todos</option>
-        <option value="confirmado">✅ Confirmados</option>
-        <option value="declinado">❌ No asistirán</option>
-        <option value="pendiente">⏳ Sin responder</option>
-        <option value="to-remind">🔔 Por recordar</option>
-        <option value="not-sent">📤 Sin enviar</option>
-        <option value="sent">Enviados</option>
-        <option value="lado-imelda">👥 De Imelda</option>
-        <option value="lado-mama">👥 De la mamá</option>
-        <option value="no-phone">Sin teléfono</option>
-      </select>
-      <select id="sort" title="Ordenar">
-        <option value="respondido">📅 Últimos en responder</option>
-        <option value="gestion">📋 Gestión (pendientes primero)</option>
-        <option value="nombre">🔤 Nombre (A-Z)</option>
-      </select>
-      <button class="btn btn-primary" id="btn-add">+ Agregar</button>
-      <button class="btn btn-yellow" id="btn-import">📥 Importar</button>
-      <button class="btn" id="btn-resumen">📋 Resumen</button>
-      <button class="btn" id="btn-csv">⬇️ Excel</button>
+      <input type="search" id="search" class="tb-search" placeholder="🔍 Buscar por nombre…" />
+      <div class="tb-selects">
+        <label class="sel-field">
+          <span class="sel-cap">Filtrar</span>
+          <select id="filter">
+            <option value="all">Todos</option>
+            <option value="confirmado">✅ Confirmados</option>
+            <option value="declinado">❌ No asistirán</option>
+            <option value="pendiente">⏳ Sin responder</option>
+            <option value="to-remind">🔔 Por recordar</option>
+            <option value="not-sent">📤 Sin enviar</option>
+            <option value="sent">Enviados</option>
+            <option value="lado-imelda">👥 De Imelda</option>
+            <option value="lado-mama">👥 De la mamá</option>
+            <option value="no-phone">Sin teléfono</option>
+          </select>
+        </label>
+        <label class="sel-field">
+          <span class="sel-cap">Ordenar</span>
+          <select id="sort">
+            <option value="respondido">📅 Últimos en responder</option>
+            <option value="gestion">📋 Gestión (pendientes primero)</option>
+            <option value="nombre">🔤 Nombre (A-Z)</option>
+          </select>
+        </label>
+      </div>
+      <div class="tb-actions">
+        <button class="btn btn-primary" id="btn-add">+ Agregar</button>
+        <button class="btn btn-yellow" id="btn-import">📥 Importar</button>
+        <button class="btn" id="btn-resumen">📋 Resumen</button>
+        <button class="btn" id="btn-csv">⬇️ Excel</button>
+      </div>
     </div>
 
     <div id="invitados-list">
