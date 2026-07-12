@@ -77,7 +77,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 16px;
+      margin-bottom: 12px;
       flex-wrap: wrap;
       gap: 8px;
     }
@@ -94,18 +94,15 @@
     /* ---- Stats ---- */
     .stats {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
-      margin-bottom: 16px;
-    }
-    @media (min-width: 640px) {
-      .stats { grid-template-columns: repeat(4, 1fr); }
+      grid-template-columns: repeat(4, 1fr);
+      gap: 7px;
+      margin-bottom: 10px;
     }
     .stat-card {
       background: var(--blanco);
-      border-radius: 16px;
-      padding: 14px 14px;
-      box-shadow: 0 6px 16px rgba(26,26,26,0.06);
+      border-radius: 13px;
+      padding: 9px 10px;
+      box-shadow: 0 4px 12px rgba(26,26,26,0.06);
       border-top: 4px solid var(--gris-claro);
     }
     .stat-card.confirmed { border-top-color: var(--verde); }
@@ -113,32 +110,33 @@
     .stat-card.pending   { border-top-color: var(--amarillo); }
     .stat-card.sent      { border-top-color: var(--rojo); }
     .stat-label {
-      font-size: 11px;
-      letter-spacing: 1px;
+      font-size: 9.5px;
+      letter-spacing: 0.5px;
       color: var(--gris);
-      font-weight: 600;
+      font-weight: 700;
       text-transform: uppercase;
+      line-height: 1.15;
     }
     .stat-value {
       font-family: 'Dancing Script', cursive;
-      font-size: 26px;
+      font-size: 24px;
       color: var(--negro);
-      margin-top: 4px;
+      margin-top: 2px;
       line-height: 1;
     }
     .stat-extra {
-      font-size: 11px;
+      font-size: 10px;
       color: var(--gris);
-      margin-top: 4px;
+      margin-top: 2px;
     }
 
     /* ---- Progress ---- */
     .progress-card {
       background: var(--blanco);
-      border-radius: 16px;
-      padding: 14px 16px;
-      margin-bottom: 16px;
-      box-shadow: 0 6px 16px rgba(26,26,26,0.06);
+      border-radius: 13px;
+      padding: 11px 14px;
+      margin-bottom: 10px;
+      box-shadow: 0 4px 12px rgba(26,26,26,0.06);
     }
     .progress-row {
       display: flex;
@@ -163,15 +161,15 @@
     /* ---- Chips de filtro rápido ---- */
     .chips {
       display: flex;
-      gap: 8px;
-      margin-bottom: 12px;
+      gap: 6px;
+      margin-bottom: 10px;
       flex-wrap: wrap;
     }
     .chip-f {
       font-family: 'Nunito', sans-serif;
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 700;
-      padding: 8px 14px;
+      padding: 6px 11px;
       border-radius: 999px;
       border: 2px solid var(--gris-claro);
       background: var(--blanco);
@@ -190,8 +188,8 @@
     .toolbar {
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      margin-bottom: 14px;
+      gap: 8px;
+      margin-bottom: 10px;
     }
     .toolbar input,
     .toolbar select {
@@ -227,13 +225,16 @@
     .sel-field select { width: 100%; }
 
     .tb-actions {
-      display: flex;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
       gap: 8px;
-      flex-wrap: wrap;
-      padding-top: 4px;
+      padding-top: 8px;
       border-top: 1px solid rgba(0,0,0,0.07);
     }
-    .tb-actions .btn { flex: 1 1 auto; }
+    @media (min-width: 640px) {
+      .tb-actions { grid-template-columns: repeat(4, 1fr); }
+    }
+    .tb-actions .btn { width: 100%; padding: 10px 8px; }
 
     .invitado-card .respondio { font-weight: 700; color: var(--rojo-osc); }
 
@@ -717,7 +718,7 @@
         <div class="stat-extra">sin responder</div>
       </div>
       <div class="stat-card sent">
-        <div class="stat-label">WhatsApp enviados</div>
+        <div class="stat-label">📤 Enviados</div>
         <div class="stat-value" id="stat-sent">0</div>
         <div class="stat-extra" id="stat-sent-extra">de 0 grupos</div>
       </div>
