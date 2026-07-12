@@ -210,18 +210,63 @@
     .toolbar select:focus { outline: none; border-color: var(--rojo); }
     .invitado-card .respondio { font-weight: 700; color: var(--rojo-osc); }
 
-    /* ---- Card de invitado ---- */
+    /* ---- Card de invitado (acordeón compacto) ---- */
     .invitado-card {
       background: var(--blanco);
-      border-radius: 18px;
-      padding: 14px 16px;
-      margin-bottom: 10px;
-      box-shadow: 0 4px 12px rgba(26,26,26,0.05);
+      border-radius: 14px;
+      margin-bottom: 7px;
+      box-shadow: 0 3px 10px rgba(26,26,26,0.05);
       border-left: 6px solid var(--gris-claro);
+      overflow: hidden;
     }
     .invitado-card.estado-confirmado { border-left-color: var(--verde); background: #F0FAF8; }
     .invitado-card.estado-declinado  { border-left-color: var(--gris);  background: #F5F5F5; }
     .invitado-card.estado-pendiente  { border-left-color: var(--amarillo); background: #FFFBEC; }
+
+    /* fila compacta (siempre visible) */
+    .inv-sum {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 14px;
+      cursor: pointer;
+      list-style: none;
+      user-select: none;
+    }
+    .inv-sum::-webkit-details-marker { display: none; }
+    .inv-sum:hover { background: rgba(0,0,0,0.03); }
+    .sum-dot { font-size: 15px; flex: 0 0 auto; }
+    .sum-name {
+      font-family: 'Nunito', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--negro);
+      flex: 1 1 auto;
+      min-width: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .sum-flag { font-size: 13px; flex: 0 0 auto; opacity: .8; }
+    .sum-right {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--gris);
+      flex: 0 0 auto;
+    }
+    .sum-chev {
+      flex: 0 0 auto;
+      color: var(--gris);
+      font-size: 13px;
+      transition: transform .15s;
+    }
+    .invitado-card[open] .sum-chev { transform: rotate(90deg); }
+
+    /* cuerpo desplegable */
+    .inv-body {
+      padding: 11px 14px 14px;
+      border-top: 1px solid rgba(0,0,0,0.06);
+    }
 
     .inv-top {
       display: flex;
@@ -929,6 +974,7 @@
     let invitados = {};
     let admins = {};
     let evento = null;
+    const openIds = new Set(); // tarjetas desplegadas (para no cerrarlas al re-renderizar en vivo)
     let invitadosUnsub = null;
     let adminsUnsub = null;
     let editingId = null;
@@ -1366,35 +1412,58 @@
         ? `<button data-action="remind" data-id="${i.id}" style="background:#FFF3CD; border-color:#B8860B; color:#7A5500;">🔔 Recordar</button>`
         : '';
 
+      const estadoEmoji = estado === 'confirmado' ? '✅' : estado === 'declinado' ? '❌' : '⏳';
+      const sumRight = estado === 'confirmado'
+        ? `${i.personasConfirmadas || 0}/${i.personasMax}`
+        : `${i.personasMax}p`;
+      const sinEnviarDot = i.enviadoEn ? '' : '<span class="sum-flag" title="Sin enviar">📤</span>';
+      const isOpen = openIds.has(i.id) ? 'open' : '';
+
       return `
-        <div class="invitado-card estado-${estado}">
-          <div class="inv-top">
-            <div class="inv-info">
-              <h3>${escapeHtml(i.nombre)}</h3>
-              <div class="inv-meta">
-                <span>${tel}</span>
-                <span>· ${i.personasMax} ${i.personasMax === 1 ? 'persona' : 'personas'}</span>
-                ${ladoSpan}
-                ${respondidoTxt}
+        <details class="invitado-card estado-${estado}" data-id="${i.id}" ${isOpen}>
+          <summary class="inv-sum">
+            <span class="sum-dot">${estadoEmoji}</span>
+            <span class="sum-name">${escapeHtml(i.nombre)}</span>
+            ${sinEnviarDot}
+            <span class="sum-right">${sumRight}</span>
+            <span class="sum-chev">▸</span>
+          </summary>
+          <div class="inv-body">
+            <div class="inv-top">
+              <div class="inv-info">
+                <div class="inv-meta">
+                  <span>${tel}</span>
+                  <span>· ${i.personasMax} ${i.personasMax === 1 ? 'persona' : 'personas'}</span>
+                  ${ladoSpan}
+                  ${respondidoTxt}
+                </div>
+              </div>
+              <div class="badges">
+                <span class="badge badge-${estado}">${estadoTxt}</span>
+                ${enviadoBadge}
               </div>
             </div>
-            <div class="badges">
-              <span class="badge badge-${estado}">${estadoTxt}</span>
-              ${enviadoBadge}
+            ${quickActions}
+            <div class="inv-actions">
+              <button class="${waCls}" data-action="wa" data-id="${i.id}">${wa}</button>
+              ${remindBtn}
+              ${undoBtn}
+              <button data-action="copy" data-id="${i.id}">🔗 Copiar link</button>
+              <button data-action="edit" data-id="${i.id}">✏️ Editar</button>
+              <button class="btn-del" data-action="delete" data-id="${i.id}">🗑️</button>
             </div>
           </div>
-          ${quickActions}
-          <div class="inv-actions">
-            <button class="${waCls}" data-action="wa" data-id="${i.id}">${wa}</button>
-            ${remindBtn}
-            ${undoBtn}
-            <button data-action="copy" data-id="${i.id}">🔗 Copiar link</button>
-            <button data-action="edit" data-id="${i.id}">✏️ Editar</button>
-            <button class="btn-del" data-action="delete" data-id="${i.id}">🗑️</button>
-          </div>
-        </div>
+        </details>
       `;
     }
+
+    // ---- Recordar qué tarjetas están abiertas (toggle no burbujea → usar captura) ----
+    $('#invitados-list').addEventListener('toggle', (e) => {
+      const d = e.target;
+      if (!d || d.tagName !== 'DETAILS' || !d.dataset.id) return;
+      if (d.open) openIds.add(d.dataset.id);
+      else openIds.delete(d.dataset.id);
+    }, true);
 
     // ---- Action delegation ----
     $('#invitados-list').addEventListener('click', async (e) => {
