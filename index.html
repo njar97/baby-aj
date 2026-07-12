@@ -891,7 +891,7 @@
     const allBtns = document.querySelectorAll('#rsvp-section button, #thanks-card button');
     allBtns.forEach(b => b.disabled = true);
     try {
-      await update(ref(db, `/${FB_PATH}/invitados/${id}`), { estado, personasConfirmadas: n, respondidoEn: Date.now() });
+      await update(ref(db, `/${FB_PATH}/invitados/${id}`), { estado, personasConfirmadas: n, respondidoEn: Date.now(), respondidoPor: 'invitado' });
       invitado.estado = estado;
       invitado.personasConfirmadas = n;
       if (withConfetti) launchConfetti();
