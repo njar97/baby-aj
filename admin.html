@@ -1561,8 +1561,7 @@
           await update(ref(db, '/baby-shower-aj/invitados/' + id), {
             estado: 'pendiente',
             personasConfirmadas: 0,
-            respondidoEn: null,
-            respondidoPor: null
+            respondidoEn: null
           });
           showToast(`↺ ${inv.nombre} volvió a pendiente`);
         } catch (err) {
@@ -1601,8 +1600,7 @@
           await update(ref(db, '/baby-shower-aj/invitados/' + id), {
             estado: 'confirmado',
             personasConfirmadas: n,
-            respondidoEn: Date.now(),
-            respondidoPor: 'admin'
+            respondidoEn: Date.now()
           });
           showToast(`✅ ${inv.nombre} confirmado · ${n} ${n === 1 ? 'persona' : 'personas'}`, 'success');
         } catch (err) {
@@ -1618,8 +1616,7 @@
           await update(ref(db, '/baby-shower-aj/invitados/' + id), {
             estado: 'declinado',
             personasConfirmadas: 0,
-            respondidoEn: Date.now(),
-            respondidoPor: 'admin'
+            respondidoEn: Date.now()
           });
           showToast(`❌ ${inv.nombre} marcado como no va`);
         } catch (err) {
